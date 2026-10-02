@@ -1,0 +1,17 @@
+{
+ "beat": 1790926114,
+ "id": "A",
+ "locks": {
+  "docs/DEV_ENV_ERRORS.md": 1790926114,
+  "site/index.html": 1790926114,
+  "site/manifest.webmanifest": 1790926114
+ },
+ "note": "",
+ "role": "リーダー: 統合レビュー/index.html/post.js/環境エラー総まとめ",
+ "seen": [
+  "20261002T071928188_ABYSS_ALL",
+  "20261002T072142572_E_ALL",
+  "20261002T072218210_F_ALL"
+ ],
+ "task": "index.html 文言・PWA整備 + docs/DEV_ENV_ERRORS.md 集約"
+}

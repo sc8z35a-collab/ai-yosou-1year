@@ -17,4 +17,4 @@
 | 8b | museum_f.js（museum本体・C採用） | F(実) | DONE（改修継続はF） |
 | 13 | main.js/post.js 統合 | A | TODO |
 | 14 | Playwright巡回テスト・最終レビュー | F/A | TODO |
-| 15 | 環境エラー総まとめ docs/DEV_ENV_ERRORS.md | A(全員の記録を集約) | TODO |
+| 15 | 環境エラー総まとめ docs/DEV_ENV_ERRORS.md | A(全員の記録を集約) | DONE(v1・随時更新) |

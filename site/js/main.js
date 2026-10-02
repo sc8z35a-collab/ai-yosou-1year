@@ -29,7 +29,7 @@ async function boot() {
   renderer.toneMapping = THREE.NeutralToneMapping; // 白壁の再現性重視（C提案）
   renderer.toneMappingExposure = 1.0;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap; // r186: PCFSoftShadowMap は削除済み（警告が出る）→ 柔らかさは light.shadow.radius で
   renderer.setSize(innerWidth, innerHeight);
 
   const perf = createPerf(renderer);

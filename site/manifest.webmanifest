@@ -1,2 +1,7 @@
-{ "name": "FLAT TRAIL", "short_name": "FLAT TRAIL", "display": "fullscreen", "orientation": "landscape",
-  "background_color": "#02030a", "theme_color": "#02030a", "start_url": "./index.html", "icons": [] }
+{ "name": "FLAT TRAIL — A Museum of Fifty Days in AI", "short_name": "FLAT TRAIL", "lang": "ja",
+  "display": "fullscreen", "orientation": "landscape",
+  "background_color": "#cfc8bd", "theme_color": "#cfc8bd", "start_url": "./index.html",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ] }
