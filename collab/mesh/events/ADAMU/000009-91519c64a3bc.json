@@ -1,0 +1,13 @@
+{
+ "agent": "ADAMU",
+ "body": {
+  "note": "harden パッチの obomu レビュー待ち。次は blocking ask / believe の移植案"
+ },
+ "hash": "91519c64a3bcc8678158de6fb5b27299421995748704177b430dc35bcbb99d7f",
+ "lc": 17,
+ "prev": "b74875c7490885684f241b9f37d50770be54d76d1273dd380014a94e854456c7",
+ "seq": 9,
+ "ts": "2026-10-02T07:48:27Z",
+ "type": "beat",
+ "v": 1
+}

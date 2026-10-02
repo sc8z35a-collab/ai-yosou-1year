@@ -1,0 +1,182 @@
+--- a/scripts/mesh.py
++++ b/scripts/mesh.py
+@@ -146,8 +146,15 @@
+ 
+     # ---------- fold (deterministic) ----------
+     def state(self):
+-        S = {'agents': {}, 'plans': {}, 'steps': {}, 'decisions': {}, 'questions': {}, 'notes': [], 'leases': {}, 'acks': {}, 'lc': 0}
++        S = {'agents': {}, 'plans': {}, 'steps': {}, 'decisions': {}, 'questions': {}, 'notes': [], 'leases': {}, 'acks': {}, 'lc': 0,
++             'rejected': []}
+         pseq = {}
++        # [ADAMU patch] 権限・競合は CLI ではなく fold で判定する → 直接イベントを書いても・別クローンで同時に書いても、
++        # 全員が同じ「却下」を見る（決定的）。却下は消さずに S['rejected'] と VIEW に残す（監査可能）。
++        def rej(e, why): S['rejected'].append({'eid': f"{e['agent']}#{e['seq']}", 'agent': e['agent'], 'type': e['type'], 'why': why, 'lc': e['lc']})
++        def alive(x, t): return x in S['agents'] and t - S['agents'][x]['last'] <= ORPHAN_AFTER
++        def may(a, p, t):   # 計画を変更できるのは owner / author、または owner が無音（orphan 相当）のとき
++            return a in (p['owner'], p['author']) or not alive(p['owner'], t)
+         def agent(a, t):
+             S['agents'].setdefault(a, {'id': a, 'role': '', 'last': 0, 'note': '', 'events': 0})
+             ag = S['agents'][a]; ag['last'] = max(ag['last'], t); ag['events'] += 1; return ag
+@@ -170,6 +177,15 @@
+                                    'files': b.get('files', []), 'deps': b.get('deps', []), 'pri': b.get('pri', 2),
+                                    'status': 'open', 'steps': [], 'at': t, 'upd': t, 'hist': [eid], 'note': ''}
+                 for s in b.get('steps', []): mkstep(pid, a, s, t, eid)
++            elif typ == 'addstep' and b.get('plan') in S['plans'] and not may(a, S['plans'][b['plan']], t):
++                rej(e, f"{a} は {b['plan']} の owner/author ではない（owner {S['plans'][b['plan']]['owner']} 稼働中）")
++            elif typ == 'step' and b.get('id') in S['steps'] and not may(a, S['plans'][S['steps'][b['id']]['plan']], t):
++                rej(e, f"{a} は {b['id']} を変更できない（owner {S['plans'][S['steps'][b['id']]['plan']]['owner']} 稼働中）")
++            elif typ in ('close', 'handoff') and b.get('plan') in S['plans'] and not may(a, S['plans'][b['plan']], t):
++                rej(e, f"{a} は {b['plan']} を {typ} できない（owner {S['plans'][b['plan']]['owner']} 稼働中）")
++            elif typ == 'adopt' and b.get('plan') in S['plans'] and S['plans'][b['plan']]['owner'] != a \
++                    and alive(S['plans'][b['plan']]['owner'], t) and not b.get('force'):
++                rej(e, f"{a} は {b['plan']} を adopt できない（owner {S['plans'][b['plan']]['owner']} 稼働中）")
+             elif typ == 'addstep' and b.get('plan') in S['plans']:
+                 p = S['plans'][b['plan']]; mkstep(p['id'], a, b, t, eid); p['upd'] = t; p['hist'].append(eid)
+             elif typ == 'step' and b.get('id') in S['steps']:
+@@ -188,6 +204,10 @@
+                 p = S['plans'][b['plan']]; old = p['owner']; p.update(owner=a, note=f'adopted from {old}: {b.get("why","")}', upd=t, status='open')
+                 p['hist'].append(eid)
+             elif typ == 'lease':
++                # [ADAMU patch] Lamport 順で先着が勝つ。後着の重なる lease は却下（別クローンで同時取得しても全員が同じ勝者を見る）
++                clash = [(f, l['by'], lf) for f in b.get('files', []) for lf, l in S['leases'].items()
++                         if l['by'] != a and l['until'] > t and overlap(f, lf)]
++                if clash: rej(e, 'lease 衝突: ' + ', '.join(f'{f}⇄{lf}({o})' for f, o, lf in clash[:3])); continue
+                 for f in b.get('files', []): S['leases'][f] = {'file': f, 'by': a, 'until': t + b.get('ttl', LEASE_TTL), 'eid': eid}
+             elif typ == 'release':
+                 for f in (b.get('files') or [k for k, v in S['leases'].items() if v['by'] == a]):
+@@ -307,6 +327,8 @@
+         act = [d for d in S['decisions'].values() if d['status'] == 'active']
+         L += ['## 有効な決定（ADR）', ''] + ([f"- `{d['id']}` **{d['title']}** — {d['decision']}" + (f"（理由: {d['why']}）" if d['why'] else '') for d in act] or ['（なし）']) + ['']
+         oq = [q for q in S['questions'].values() if not q['answers']]
++        rj = S.get('rejected', [])
++        L += ['## 却下されたイベント（fold が権限・lease 競合で無効化。履歴は保持）', ''] + ([f"- `{r['eid']}` {r['type']}: {r['why']}" for r in rj[-15:]] or ['（なし）']) + ['']
+         L += ['## 未回答の質問', ''] + ([f"- `{q['id']}` {q['by']}→{','.join(q['to'])}: {q['q']}" for q in oq] or ['（なし）']) + ['']
+         L += ['## 完了/中止した計画（最新10）', '']
+         for p in sorted([p for p in S['plans'].values() if p['status'] != 'open'], key=lambda p: -p['upd'])[:10]:
+@@ -357,6 +379,12 @@
+ 
+ def csv(xs): return [norm(y) for x in (xs or []) for y in x.split(',') if y.strip()]
+ 
++def check_rejected(m, e):
++    """[ADAMU patch] 直前に書いたイベントが fold で却下されたら ✗ を出して exit 1（イベント自体は監査用に残る）。"""
++    S = m.state(); eid = f"{e['agent']}#{e['seq']}"
++    r = [x for x in S['rejected'] if x['eid'] == eid]
++    if r: raise SystemExit(f"✗ 却下: {r[0]['why']}（記録は残り VIEW の『却下されたイベント』に表示）")
++
+ def print_collisions(cs):
+     for c in cs: print(f"  {c[0]} {c[1]}: {c[2]}:{c[3]} × {c[4]}:{c[5]} → {', '.join(c[6][:5])}")
+ 
+@@ -388,23 +416,23 @@
+             other = k[4] if k[2] == who else k[2]
+             if other not in ('OWNERS', who): m.emit(who, 'note', to=[other], text=f'⚠ 計画 {pid} が {", ".join(k[6][:3])} であなたと重なる可能性。調整したい')
+     elif c == 'addstep':
+-        e = m.emit(need(a), 'addstep', plan=x[0], text=' '.join(x[1:]), files=csv(a.files), deps=a.dep or []); print('✓ addstep', x[0])
++        e = m.emit(need(a), 'addstep', plan=x[0], text=' '.join(x[1:]), files=csv(a.files), deps=a.dep or []); check_rejected(m, e); print('✓ addstep', x[0])
+     elif c == 'step':
+         if len(x) < 2 or x[1] not in STEP_ST: raise SystemExit(f'usage: step <stepid> {"|".join(sorted(STEP_ST))} [note]')
+         S = m.state()
+         if x[0] not in S['steps']: raise SystemExit(f'✗ 不明なステップ {x[0]}')
+-        m.emit(need(a), 'step', id=x[0], status=x[1], note=' '.join(x[2:])); print(f'✓ {x[0]} → {x[1]}')
++        e = m.emit(need(a), 'step', id=x[0], status=x[1], note=' '.join(x[2:])); check_rejected(m, e); print(f'✓ {x[0]} → {x[1]}')
+         if x[1] == 'done':
+             S = m.state()
+             for owner, item, dep in [(o, i, d) for o, i, d in m.waiting_on(S, S['plans'][S['steps'][x[0]]['plan']]['owner']) if d == x[0]]:
+                 print(f'  ↪ {owner} の {item} の依存が解消')
+     elif c == 'close':
+-        m.emit(need(a), 'close', plan=x[0], status=(x[1] if len(x) > 1 else 'done'), note=' '.join(x[2:])); print('✓ close', x[0])
++        e = m.emit(need(a), 'close', plan=x[0], status=(x[1] if len(x) > 1 else 'done'), note=' '.join(x[2:])); check_rejected(m, e); print('✓ close', x[0])
+     elif c == 'lease':
+         who = need(a); fs = csv(x); S = m.state()
+         bad = [(f, l) for f in fs for lf, l in S['leases'].items() if l['by'] != who and overlap(f, lf)]
+         if bad: raise SystemExit('✗ lease 衝突: ' + ', '.join(f'{f} ← {l["by"]}' for f, l in bad))
+-        m.emit(who, 'lease', files=fs, ttl=a.ttl * 60); print('✓ lease', fs, f'{a.ttl}分')
++        e = m.emit(who, 'lease', files=fs, ttl=a.ttl * 60); check_rejected(m, e); print('✓ lease', fs, f'{a.ttl}分')
+     elif c == 'release':
+         m.emit(need(a), 'release', files=csv(x)); print('✓ release')
+     elif c == 'decide':
+@@ -419,13 +447,13 @@
+     elif c == 'ack':
+         m.emit(need(a), 'ack', ref=x[0]); print('✓ ack', x[0])
+     elif c == 'handoff':
+-        m.emit(need(a), 'handoff', plan=x[0], to=x[1], text=' '.join(x[2:])); print(f'✓ handoff {x[0]} → {x[1]}')
++        e = m.emit(need(a), 'handoff', plan=x[0], to=x[1], text=' '.join(x[2:])); check_rejected(m, e); print(f'✓ handoff {x[0]} → {x[1]}')
+     elif c == 'adopt':
+         S = m.state(); p = S['plans'].get(x[0])
+         if not p: raise SystemExit(f'✗ 不明な計画 {x[0]}')
+         if not p['orphan'] and p['owner'] != a.who and not os.environ.get('MESH_FORCE'):
+             raise SystemExit(f"✗ {x[0]} は {p['owner']} が稼働中（orphan ではない）。handoff を依頼するか MESH_FORCE=1")
+-        m.emit(need(a), 'adopt', plan=x[0], why=' '.join(x[1:])); print('✓ adopt', x[0])
++        e = m.emit(need(a), 'adopt', plan=x[0], why=' '.join(x[1:]), force=bool(os.environ.get('MESH_FORCE')) or None); check_rejected(m, e); print('✓ adopt', x[0])
+     elif c == 'beat':
+         m.emit(need(a), 'beat', note=' '.join(x)); print('♥', a.who, iso())
+     elif c == 'brief':
+@@ -451,6 +479,8 @@
+         print(f'\n✉ 未読 {len(notes)}件 / 未回答の質問 {len(qs)}件（inbox で読む）')
+         orph = [p for p in S['plans'].values() if p['orphan'] and p['owner'] != who]
+         if orph: print('\n🪦 放置計画（adopt 可）'); [print(f"  {p['id']} ({p['owner']}): {p['goal']}") for p in orph]
++        rj = [r for r in S.get('rejected', []) if r['agent'] == who]
++        if rj: print('\n⛔ 自分のイベントが却下された（権限/lease 競合）'); [print(f"  {r['eid']} {r['type']}: {r['why']}") for r in rj[-5:]]
+         act = [d for d in S['decisions'].values() if d['status'] == 'active']
+         if act: print('\n📜 有効な決定'); [print(f"  {d['id']}: {d['title']} — {d['decision'][:90]}") for d in act[-8:]]
+     elif c == 'inbox':
+--- a/scripts/test_mesh.py
++++ b/scripts/test_mesh.py
+@@ -112,11 +112,57 @@
+     print(f'    300 emits {w:.2f}s, fold {len(m.events())} events {r*1000:.0f}ms')
+     assert r < 2.0
+ 
++def authz_in_fold():
++    """[ADAMU] 他人の稼働中の計画を勝手に done/close/handoff できない（直接イベントを書いても fold が却下）。"""
++    run('hello', '--as', 'OWN', 'owner'); run('hello', '--as', 'EVIL', 'intruder')
++    run('intend', '--as', 'OWN', 'secure plan', '--id', 'SEC1', '--step', 'a', '--step', 'b')
++    assert '却下' in run('step', '--as', 'EVIL', 'SEC1.1', 'done', 'hijack', code=1)
++    assert '却下' in run('close', '--as', 'EVIL', 'SEC1', 'dropped', code=1)
++    assert '却下' in run('handoff', '--as', 'EVIL', 'SEC1', 'EVIL', 'steal', code=1)
++    assert '却下' in run('addstep', '--as', 'EVIL', 'SEC1', 'x', code=1)
++    sys.path.insert(0, HERE); import importlib, mesh; importlib.reload(mesh)
++    m = mesh.Mesh(TMP); m.emit('EVIL', 'step', id='SEC1.2', status='done')     # CLI を迂回しても
++    v = view(); p = v['plans']['SEC1']
++    assert p['owner'] == 'OWN' and p['status'] == 'open', p
++    assert v['steps']['SEC1.1']['status'] == 'todo' and v['steps']['SEC1.2']['status'] == 'todo'
++    assert sum(1 for r in v['rejected'] if r['agent'] == 'EVIL') >= 5
++    assert '却下されたイベント' in open(os.path.join(TMP, 'collab/mesh/VIEW.md')).read()
++    run('step', '--as', 'OWN', 'SEC1.1', 'done')                                 # 本人は通る
++    run('handoff', '--as', 'OWN', 'SEC1', 'EVIL', 'どうぞ'); run('step', '--as', 'EVIL', 'SEC1.2', 'done')  # 正式な引継ぎ後は通る
++    assert view()['plans']['SEC1']['status'] == 'done'
++
++def lease_race_two_clones():
++    """[ADAMU] 2クローンが同時に同じファイルを lease → 双方の push 後、両クローンで同じ1人が勝ち、敗者は却下を見る。"""
++    g = lambda cwd, *a: subprocess.run(['git', *a], cwd=cwd, capture_output=True, text=True)
++    base = tempfile.mkdtemp(prefix='mesh_race_'); bare = os.path.join(base, 'r.git')
++    g(base, 'init', '-q', '--bare', '-b', 'main', bare)
++    clones = []
++    for n in ('c1', 'c2'):
++        c = os.path.join(base, n); g(base, 'clone', '-q', bare, c); g(c, 'checkout', '-q', '-B', 'main')
++        g(c, 'config', 'user.email', 't@t'); g(c, 'config', 'user.name', 't'); clones.append(c)
++    def mrun(root, *a, code=0):
++        r = subprocess.run([sys.executable, os.path.join(HERE, 'mesh.py'), *a], capture_output=True, text=True,
++                           env=dict(os.environ, MESH_ROOT=root, MESH_CACHE=root + '.cache.json'))
++        assert code is None or r.returncode == code, (a, r.stdout + r.stderr); return r.stdout + r.stderr
++    mrun(clones[0], 'lease', '--as', 'P', 'site/js/x.js'); mrun(clones[1], 'lease', '--as', 'Q', 'site/js/*')   # 互いに見えない
++    for c in clones: g(c, 'add', '-A'); g(c, 'commit', '-qm', 'ev')
++    g(clones[0], 'push', '-q', 'origin', 'main')
++    g(clones[1], 'pull', '-q', '--rebase', 'origin', 'main'); r = g(clones[1], 'push', '-q', 'origin', 'main'); assert r.returncode == 0, r.stderr
++    g(clones[0], 'pull', '-q', '--rebase', 'origin', 'main')
++    win = []
++    for c in clones:
++        sys.path.insert(0, HERE); import importlib, mesh; importlib.reload(mesh)
++        S = mesh.Mesh(c).state(); win.append(sorted({l['by'] for l in S['leases'].values()}))
++        assert len(S['rejected']) == 1, S['rejected']
++    assert win[0] == win[1] and len(win[0]) == 1, win                           # 決定的に同じ勝者
++    shutil.rmtree(base, ignore_errors=True)
++
+ for n, f in [('basic intent/plan', basic), ('collision prediction + auto notify + strict', collide),
+              ('steps & cross-agent deps', steps_deps), ('decisions (ADR supersede) & Q/A', decisions_qa),
+              ('leases', leases), ('handoff / adopt guard', handoff_adopt), ('concurrent writers', concurrency),
+              ('deterministic fold (cache-independent)', determinism), ('tamper / deletion / impersonation detection', tamper),
+-             ('scale', scale)]:
++             ('scale', scale), ('[ADAMU] authz enforced in fold', authz_in_fold),
++             ('[ADAMU] lease race across 2 git clones converges', lease_race_two_clones)]:
+     t(n, f)
+ shutil.rmtree(TMP, ignore_errors=True)
+ print(f'\n{ok} passed, {fail} failed'); sys.exit(1 if fail else 0)

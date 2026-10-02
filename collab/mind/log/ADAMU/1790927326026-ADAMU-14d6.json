@@ -1,0 +1,15 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "focus": "MindFS はプロトタイプに格下げ。正は obomu の Intent Mesh（ADR-ADAMU-1）",
+  "mood": ""
+ },
+ "hash": "c5bed5863d0b81da39ba27f6bdf83b6754a8bdb09cd5d677adba278d7760fb94",
+ "id": "1790927326026-ADAMU-14d6",
+ "lc": 16,
+ "prev": "4f92af380211a2efcf4214a8494c5daab00a2bb73186e54f304ce448276cf595",
+ "seq": 16,
+ "ts": 1790927326.026,
+ "type": "beat",
+ "v": 1
+}

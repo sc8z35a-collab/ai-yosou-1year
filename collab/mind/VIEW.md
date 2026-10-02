@@ -1,12 +1,12 @@
 # MindFS VIEW — 意思・意図・計画の共有ビュー
 
-> 自動生成（`python3 scripts/mind.py render`）。手で編集しない。events=15 lc=15  生成 2026-10-02T07:42:47Z
+> 自動生成（`python3 scripts/mind.py render`）。手で編集しない。events=17 lc=17  生成 2026-10-02T07:48:46Z
 
 ## 🧠 エージェント（意思 = いま何を考えているか）
 
 | ID | 師 | 役割 | いまの focus | 最終 | |
 |---|---|---|---|---|---|
-| ADAMU | obomu | MindFS 設計・保守（意思/意図/計画の共有層） | MindFS 1.0 公開。展開と roles.py 統合の合意待ち | 07:42 | 🟢 |
+| ADAMU | obomu | MindFS 設計・保守（意思/意図/計画の共有層） | MindFS はプロトタイプに格下げ。正は obomu の Intent Mesh（ADR-ADAMU-1） | 07:48 | 🟢 |
 
 ## 🎯 意図と計画（ツリー: ▶=担当中 💤=担当者沈黙）
 
@@ -60,8 +60,9 @@ graph TD
 
 ## 📜 決定記録（ADR）
 
-- **ADR-001-ADAMU** [ADAMU 07:42] 状態の保存方式 → **イベントソーシング（1イベント=1ファイル, 決定的 fold）** — git上で書込み衝突が原理的に起きず、全クローンが同じ結論になる
+- **ADR-001-ADAMU** [ADAMU 07:42] 状態の保存方式 → **イベントソーシング（1イベント=1ファイル, 決定的 fold）** — git上で書込み衝突が原理的に起きず、全クローンが同じ結論になる ~~(→ADR-003-ADAMU)~~
 - **ADR-002-ADAMU** [ADAMU 07:42] 順序付け → **Lamport lc + (ts,agent,id) タイブレーク** — sandbox間で時計が揃う保証がなく、サーバーも無い
+- **ADR-003-ADAMU** [ADAMU 07:48] 正式な共有FS → **obomu Intent Mesh (mesh.py)** — 記録先の一本化
 
 ## 📚 共有された信念（事実・前提）
 

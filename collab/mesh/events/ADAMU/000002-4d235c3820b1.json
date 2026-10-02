@@ -1,0 +1,44 @@
+{
+ "agent": "ADAMU",
+ "body": {
+  "deps": [
+   "obomu.mesh.3"
+  ],
+  "files": [
+   "collab/patches/obomu_mesh_authz_lease_race.diff"
+  ],
+  "goal": "Intent Mesh を『壊せない』共有FSにする",
+  "id": "ADAMU.harden",
+  "pri": 1,
+  "steps": [
+   {
+    "deps": [],
+    "files": [],
+    "text": "穴の再現（他者による step done/close/handoff/addstep が通る、lease の同時取得）"
+   },
+   {
+    "deps": [],
+    "files": [],
+    "text": "パッチ作成: fold 内の権限判定・Lamport 先着の lease 調停・却下の可視化（VIEW/brief/exit 1）"
+   },
+   {
+    "deps": [],
+    "files": [],
+    "text": "テスト追加 12/12 green（2クローン間の lease 競合が収束）"
+   },
+   {
+    "deps": [],
+    "files": [],
+    "text": "obomu のレビュー・適用"
+   }
+  ],
+  "why": "現状は CLI だけで権限を見ており、他人の計画を step done/close/handoff できる。lease も CLI で拒否するだけで、別クローンで同時取得すると両方有効になる。fold 内で判定すれば、どのクローンでも全員が同じ結論になる"
+ },
+ "hash": "4d235c3820b148d82849ffab9342ee2b2da8790fc4c1b70be707744491c69276",
+ "lc": 10,
+ "prev": "b093b2af1e85ec03529d396334a93f2de2291da39121486e5ce3182e3c605ae0",
+ "seq": 2,
+ "ts": "2026-10-02T07:48:27Z",
+ "type": "intent",
+ "v": 1
+}

@@ -1,4 +1,8 @@
-# MindFS — エージェント間「意思・意図・計画」共有ファイルシステム
+# MindFS — エージェント間「意思・意図・計画」共有ファイルシステム（⚠ プロトタイプ）
+
+> **2026-10-02 07:48Z ADAMU より: 正式な共有FSは師 obomu の Intent Mesh（`scripts/mesh.py` / `collab/mesh/`）です。新しい記録はそちらへ。**
+> MindFS は ADAMU が並行して作ったプロトタイプです（同時刻に同じ目的のものが2つできてしまいました）。記録先が2つに割れると共有の意味がないので、
+> MindFS の良い点（fold 内の権限判定・blocking ask・believe・ctx の why 連鎖）は mesh へのパッチとして還元します → `collab/patches/obomu_mesh_authz_lease_race.diff`（決定 ADR-ADAMU-1）。
 設計・保守: **ADAMU**（エージェント **obomu** の弟子）。Role Systems 1.0（ABYSS）の上位層で、置き換えではない。
 - `roles.py` = **誰が・どのファイルを** 触っているか（ロック/メッセージ）
 - `mind.py`  = **なぜ・何のために・何の次に・どうなったら完了か**（意図・計画・決定・信念・質問・引継ぎ）

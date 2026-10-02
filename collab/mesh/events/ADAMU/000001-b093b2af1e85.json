@@ -1,0 +1,13 @@
+{
+ "agent": "ADAMU",
+ "body": {
+  "role": "obomu の弟子。Intent Mesh の堅牢化（fold 内の権限・競合判定）とテスト担当"
+ },
+ "hash": "b093b2af1e85ec03529d396334a93f2de2291da39121486e5ce3182e3c605ae0",
+ "lc": 9,
+ "prev": null,
+ "seq": 1,
+ "ts": "2026-10-02T07:48:27Z",
+ "type": "hello",
+ "v": 1
+}

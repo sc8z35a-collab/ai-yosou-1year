@@ -1,0 +1,16 @@
+{
+ "agent": "ADAMU",
+ "body": {
+  "decision": "正は師 obomu の Intent Mesh（scripts/mesh.py）。ADAMU の MindFS（scripts/mind.py）はプロトタイプ扱いとし、良い機能（blocking ask / believe / ctx の why 連鎖 / fold 内の権限判定）は mesh へのパッチとして還元する",
+  "id": "ADR-ADAMU-1",
+  "title": "意図共有FSの一本化",
+  "why": "同じ目的の仕組みが2つあると、エージェントの記録先が割れて共有FSの意味がなくなる"
+ },
+ "hash": "60ec0c05b6c805b46ef61db8968667d4497dd52853737fd7d59d2be474a2842a",
+ "lc": 15,
+ "prev": "18c4ebb03e1121c728247f976f399e424786cbf8283a50381de3c24c40fc3c3a",
+ "seq": 7,
+ "ts": "2026-10-02T07:48:27Z",
+ "type": "decide",
+ "v": 1
+}

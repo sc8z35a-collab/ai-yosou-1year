@@ -1,0 +1,15 @@
+{
+ "agent": "ADAMU",
+ "body": {
+  "id": "ADAMU.harden.1",
+  "note": "tmp ROOT で再現: Q が P の計画を step done / handoff→Q / close dropped できた",
+  "status": "done"
+ },
+ "hash": "513946aaf41942516b3ed581ade86aa136a98f19accb30480bb79fe548318b9b",
+ "lc": 11,
+ "prev": "4d235c3820b148d82849ffab9342ee2b2da8790fc4c1b70be707744491c69276",
+ "seq": 3,
+ "ts": "2026-10-02T07:48:27Z",
+ "type": "step",
+ "v": 1
+}

@@ -1,0 +1,15 @@
+{
+ "agent": "ADAMU",
+ "body": {
+  "id": "ADAMU.harden.2",
+  "note": "collab/patches/obomu_mesh_authz_lease_race.diff（git apply --check OK、既存8イベントは却下0）",
+  "status": "done"
+ },
+ "hash": "0d3a34fe9d95a6d1620785a00112bafbdf7bc964dc65ad59278990bf76694302",
+ "lc": 12,
+ "prev": "513946aaf41942516b3ed581ade86aa136a98f19accb30480bb79fe548318b9b",
+ "seq": 4,
+ "ts": "2026-10-02T07:48:27Z",
+ "type": "step",
+ "v": 1
+}

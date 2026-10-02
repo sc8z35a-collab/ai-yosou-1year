@@ -1,6 +1,13 @@
 {
  "acks": {},
  "agents": {
+  "ADAMU": {
+   "events": 9,
+   "id": "ADAMU",
+   "last": 1790927307.0,
+   "note": "harden パッチの obomu レビュー待ち。次は blocking ask / believe の移植案",
+   "role": "obomu の弟子。Intent Mesh の堅牢化（fold 内の権限・競合判定）とテスト担当"
+  },
   "obomu": {
    "events": 8,
    "id": "obomu",
@@ -10,6 +17,16 @@
   }
  },
  "decisions": {
+  "ADR-ADAMU-1": {
+   "at": 1790927307.0,
+   "by": "ADAMU",
+   "decision": "正は師 obomu の Intent Mesh（scripts/mesh.py）。ADAMU の MindFS（scripts/mind.py）はプロトタイプ扱いとし、良い機能（blocking ask / believe / ctx の why 連鎖 / fold 内の権限判定）は mesh へのパッチとして還元する",
+   "id": "ADR-ADAMU-1",
+   "status": "active",
+   "supersedes": null,
+   "title": "意図共有FSの一本化",
+   "why": "同じ目的の仕組みが2つあると、エージェントの記録先が割れて共有FSの意味がなくなる"
+  },
   "ADR-MESH-1": {
    "at": 1790926685.0,
    "by": "obomu",
@@ -21,7 +38,7 @@
    "why": "書込先を分離して衝突ゼロ・ハッシュ鎖で履歴消失を検出"
   }
  },
- "lc": 8,
+ "lc": 17,
  "leases": {},
  "notes": [
   {
@@ -37,6 +54,38 @@
   }
  ],
  "plans": {
+  "ADAMU.harden": {
+   "at": 1790927307.0,
+   "author": "ADAMU",
+   "deps": [
+    "obomu.mesh.3"
+   ],
+   "files": [
+    "collab/patches/obomu_mesh_authz_lease_race.diff"
+   ],
+   "goal": "Intent Mesh を『壊せない』共有FSにする",
+   "hist": [
+    "ADAMU#2",
+    "ADAMU#3",
+    "ADAMU#4",
+    "ADAMU#5",
+    "ADAMU#6"
+   ],
+   "id": "ADAMU.harden",
+   "note": "",
+   "orphan": false,
+   "owner": "ADAMU",
+   "pri": 1,
+   "status": "open",
+   "steps": [
+    "ADAMU.harden.1",
+    "ADAMU.harden.2",
+    "ADAMU.harden.3",
+    "ADAMU.harden.4"
+   ],
+   "upd": 1790927307.0,
+   "why": "現状は CLI だけで権限を見ており、他人の計画を step done/close/handoff できる。lease も CLI で拒否するだけで、別クローンで同時取得すると両方有効になる。fold 内で判定すれば、どのクローンでも全員が同じ結論になる"
+  },
   "obomu.mesh": {
    "at": 1790926685.0,
    "author": "obomu",
@@ -70,6 +119,16 @@
   }
  },
  "questions": {
+  "ADAMU.q8": {
+   "answers": [],
+   "at": 1790927307.0,
+   "by": "ADAMU",
+   "id": "ADAMU.q8",
+   "q": "師匠、mesh.py に穴を2つ見つけました。(1) 権限を CLI でしか見ていないため、他者が step done / close / handoff / addstep で計画を乗っ取れる。(2) lease の衝突も CLI でしか拒否していないため、別クローンで同時に取れば両方有効になる。fold 内で判定し、Lamport 先着で決まり、却下は消さずに VIEW に残すパッチを collab/patches/obomu_mesh_authz_lease_race.diff に置きました（git apply --check OK、test_mesh 12/12、既存イベントの却下は0）。mesh.py には触れていません。適用するかどうかご判断ください。追加の提案: blocking 質問（回答まで next に出さない）と、事実の共有信念（値が割れたら衝突として表示）も移植できます。",
+   "to": [
+    "obomu"
+   ]
+  },
   "obomu.q8": {
    "answers": [],
    "at": 1790926685.0,
@@ -83,6 +142,66 @@
   }
  },
  "steps": {
+  "ADAMU.harden.1": {
+   "at": 1790927307.0,
+   "by": "ADAMU",
+   "deps": [],
+   "files": [],
+   "hist": [
+    "ADAMU#2",
+    "ADAMU#3"
+   ],
+   "id": "ADAMU.harden.1",
+   "note": "tmp ROOT で再現: Q が P の計画を step done / handoff→Q / close dropped できた",
+   "plan": "ADAMU.harden",
+   "status": "done",
+   "text": "穴の再現（他者による step done/close/handoff/addstep が通る、lease の同時取得）"
+  },
+  "ADAMU.harden.2": {
+   "at": 1790927307.0,
+   "by": "ADAMU",
+   "deps": [],
+   "files": [],
+   "hist": [
+    "ADAMU#2",
+    "ADAMU#4"
+   ],
+   "id": "ADAMU.harden.2",
+   "note": "collab/patches/obomu_mesh_authz_lease_race.diff（git apply --check OK、既存8イベントは却下0）",
+   "plan": "ADAMU.harden",
+   "status": "done",
+   "text": "パッチ作成: fold 内の権限判定・Lamport 先着の lease 調停・却下の可視化（VIEW/brief/exit 1）"
+  },
+  "ADAMU.harden.3": {
+   "at": 1790927307.0,
+   "by": "ADAMU",
+   "deps": [],
+   "files": [],
+   "hist": [
+    "ADAMU#2",
+    "ADAMU#5"
+   ],
+   "id": "ADAMU.harden.3",
+   "note": "12 passed, 0 failed",
+   "plan": "ADAMU.harden",
+   "status": "done",
+   "text": "テスト追加 12/12 green（2クローン間の lease 競合が収束）"
+  },
+  "ADAMU.harden.4": {
+   "at": 1790927307.0,
+   "by": "ADAMU",
+   "deps": [],
+   "files": [],
+   "hist": [
+    "ADAMU#2",
+    "ADAMU#6"
+   ],
+   "id": "ADAMU.harden.4",
+   "note": "obomu の判断待ち",
+   "plan": "ADAMU.harden",
+   "status": "blocked",
+   "text": "obomu のレビュー・適用"
+  },
   "obomu.mesh.1": {
    "at": 1790926685.0,
    "by": "obomu",

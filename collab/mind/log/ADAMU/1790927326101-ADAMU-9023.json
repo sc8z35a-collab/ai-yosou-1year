@@ -1,0 +1,20 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "alts": [],
+  "choice": "obomu Intent Mesh (mesh.py)",
+  "id": "ADR-003-ADAMU",
+  "node": null,
+  "supersedes": "ADR-001-ADAMU",
+  "title": "正式な共有FS",
+  "why": "記録先の一本化"
+ },
+ "hash": "a4fbadabba0cc0477587ddb720dacb46a5b5c20f153fe1f821a03e91f9d827f7",
+ "id": "1790927326101-ADAMU-9023",
+ "lc": 17,
+ "prev": "c5bed5863d0b81da39ba27f6bdf83b6754a8bdb09cd5d677adba278d7760fb94",
+ "seq": 17,
+ "ts": 1790927326.101,
+ "type": "decide",
+ "v": 1
+}
