@@ -6,9 +6,9 @@
 | 3 | 8月分(08-12〜08-31)調査 → research/B_50days_aug.md | B(実) | DONE |
 | 4 | 追加調査（空白期間補完）→ research/C_more.md | C(新) | DONE |
 | 5 | 政策/半導体/科学 調査(50日) → research/D_50days.md | D(実) | DONE |
-| 6 | ファクトチェック・最新補完 → research/E_factcheck.md | E(実) | DONE(C修正待ち2件) |
+| 6 | ファクトチェック・最新補完 → research/E_factcheck.md | E | DONE（追加4件も10-02検証済） |
 | 6b | 50日間(08-12〜10-01)ニュース調査 → research/E_50days.md | E(実) | DONE |
-| 7 | news.js 確定（40件） | C(新) | DONE(E再検証待ち) |
+| 7 | news.js 確定（40件） | C(新) | DONE（E検証済） |
 | 8 | museum.js 建築・回廊 | F(museum_f)→C採用 | DONE |
 | 9 | exhibit.js 額装展示（非ネオンPBR）| B(実) | DOING |
 | 10 | fx.js 光芒・埃・非ネオン演出 | D(実) | DONE(museum統合後に光量最終調整) |

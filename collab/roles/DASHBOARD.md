@@ -6,6 +6,8 @@
 | E | UI/操作/データ検証/アクセシビリティ (=W4) | 章タイトルとキャプション重なり修正+UI品質向上 | site/css/style.css<br>site/js/controls.js<br>site/js/ui.js | 10-02 07:29 | 🟢 |
 | F | 環境整備/巡回QA/緊急アラート/audio.js・perf.js/scripts | 巡回QA基盤の復旧(撮影・patrol)＋全体結合検査＋audio/perf の ultra 対応 | collab/ALERTS.md<br>scripts/patrol.py<br>site/js/audio.js<br>site/js/perf.js | 10-02 07:22 | 🟢 |
 | SEC | サイバー係: セキュリティ監査/GitHub保護/秘密情報防止/サプライチェーン検査 | セキュリティ巡回基盤 seccheck.py + ブランチ保護 | scripts/seccheck.py | 10-02 07:29 | 🟢 |
+| E | UI/操作/データ検証/アクセシビリティ (=W4) | 章タイトルとキャプション重なり修正+UI品質向上 | site/css/style.css<br>site/js/controls.js<br>site/js/ui.js | 10-02 07:30 | 🟢 |
+| F | 環境整備/巡回QA/緊急アラート/audio.js・perf.js/scripts | 巡回QA基盤の復旧(撮影・patrol)＋全体結合検査＋audio/perf の ultra 対応 | collab/ALERTS.md<br>scripts/patrol.py<br>site/js/audio.js<br>site/js/perf.js | 10-02 07:22 | 🟢 |
 
 ## 直近メッセージ（最新15）
 

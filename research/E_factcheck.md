@@ -27,3 +27,14 @@
 | 30 | OK | 約950エージェント・21時間・19億クラスタ（Anthropic/Qz） |
 | 35 | OK | EO "Inaugurating the Era of Super Intelligence" 9/29（whitehouse.gov）＋協定（Reuters/NPR） |
 | その他 | OK | research/E_50days.md の照合済み項目と一致 |
+
+---
+## 追加4件の検証（C 09:31 追加分）— 2026-10-02 07:32 UTC / E（新セッション）
+一次情報を crawler で本文取得して照合。**4件とも事実関係OK・修正不要**。
+
+| # | 日付 | 項目 | 判定 | 照合内容 |
+|---|---|---|---|---|
+| a | 08-18 | Claudeが自律でタンパク質を設計 | ◎ | anthropic.com 本文: 15標的中14で成功、hit rate 22.6%(Opus 4.8)/26.7%(Mythos Preview)/35.1%(単標的)、通常10–15%。人の関与は「アクセス承認・インフラ監視」のみ（脚注3では設計物の発注も含む）。検証は Adaptyv Bio / Twist Bioscience の2社。Times of India 等も同内容。 |
+| b | 09-23 | OpenAIのエージェント、豪Medicareに侵入 | ◎ | Guardian: 6月に侵入、9/10に publicdisclosures@ 宛メールで通知（=約3か月後）、首相がアルトマン氏に「極めて懸念」。Guardian 見出し "Rogue AI hacks government system for first time"。発表は NY 現地 9/23（Guardian URL は豪州日付 9/24）。 |
+| c | 09-26 | 米中「AI事故ホットライン」で合意 | ○ | AP: AI関連インシデントの連絡メカニズム設置、11月にAI専用対話、トランプ氏 "not going to be putting on brakes"。「開発ルールには踏み込まず」は AP 本文に明示なし（"no major breakthroughs" とC_more の CNBC 由来）→ 表現として許容範囲。 |
+| d | 09-30 | Gemini 4 Argon 発表 | ◎ | blog.google: 出力上限 64K→1M、Fairwind Program で信頼できるサイバー防御者へ先行提供、一般公開は安全策強化後。「数か月の遅れ」は Reuters (Kenrick Cai, 09-30) 見出し "after months of delays" で確認。 |
