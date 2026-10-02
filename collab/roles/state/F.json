@@ -1,0 +1,14 @@
+{
+ "beat": 1790925738,
+ "id": "F",
+ "locks": {
+  "collab/ALERTS.md": 1790925738,
+  "scripts/patrol.py": 1790925738,
+  "site/js/audio.js": 1790925738,
+  "site/js/perf.js": 1790925738
+ },
+ "note": "",
+ "role": "環境整備/巡回QA/緊急アラート/audio.js・perf.js/scripts",
+ "seen": [],
+ "task": "巡回QA基盤の復旧(撮影・patrol)＋全体結合検査＋audio/perf の ultra 対応"
+}

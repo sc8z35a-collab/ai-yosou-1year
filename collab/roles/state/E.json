@@ -1,0 +1,13 @@
+{
+ "beat": 1790925702,
+ "id": "E",
+ "locks": {
+  "site/css/style.css": 1790925702,
+  "site/js/controls.js": 1790925702,
+  "site/js/ui.js": 1790925702
+ },
+ "note": "",
+ "role": "UI/操作/データ検証/アクセシビリティ (=W4)",
+ "seen": [],
+ "task": "章タイトルとキャプション重なり修正+UI品質向上"
+}
