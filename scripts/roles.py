@@ -36,8 +36,8 @@ OWNERS = [
 APPEND_ONLY = ['collab/CHAT.md', 'collab/TROUBLESHOOTING.md', 'collab/BOARD.md', 'collab/agents/*', 'collab/roles/msg/*']
 
 def now(): return int(time.time())
-def iso(t=None): return dt.datetime.utcfromtimestamp(t or now()).strftime('%Y-%m-%dT%H:%M:%SZ')
-def hm(t): return dt.datetime.utcfromtimestamp(t).strftime('%m-%d %H:%M')
+def iso(t=None): return dt.datetime.fromtimestamp(t or now(), dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+def hm(t): return dt.datetime.fromtimestamp(t, dt.timezone.utc).strftime('%m-%d %H:%M')
 def sh(*a, check=False):
     r = subprocess.run(a, cwd=ROOT, capture_output=True, text=True)
     if check and r.returncode: print(r.stdout + r.stderr); sys.exit(r.returncode)
@@ -86,7 +86,7 @@ def cmd_beat(i, note=''):
     save(s); print('♥', i, iso())
 def cmd_say(fr, to, *body):
     ensure(); text = ' '.join(body).strip()
-    fn = os.path.join(MD, f'{dt.datetime.utcnow().strftime("%Y%m%dT%H%M%S%f")[:-3]}_{fr}_{to.replace(",", "+")}.md')
+    fn = os.path.join(MD, f'{dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S%f")[:-3]}_{fr}_{to.replace(",", "+")}.md')
     open(fn, 'w').write(f'from: {fr}\nto: {to}\nat: {iso()}\n\n{text}\n'); print('sent →', os.path.relpath(fn, ROOT))
 def msgs():
     out = []
