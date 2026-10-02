@@ -126,7 +126,9 @@ html.g #card::after { left: 6px; width: 2px; }
 .g-card-room::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--g-hair), transparent); }
 html.g #card-no { font-weight: 400; font-size: 2.5em; }
 html.g #card-cat { border-color: var(--g-hair-gold); color: var(--g-gold-lo); border-radius: 1px; }
-html.g #card-title { letter-spacing: .03em; font-feature-settings: "palt" 1; }
+html.g #card-title { letter-spacing: .03em; font-feature-settings: "palt" 1; word-break: auto-phrase; text-wrap: balance; }
+html.g #card-summary { word-break: auto-phrase; text-wrap: pretty; }
+html.g #room-title .rt-sub, html.g .tagline-jp, html.g #finale .f-title { word-break: auto-phrase; }
 html.g #card-summary { border-top: 0; padding-top: calc(var(--u) * 1.6); background: linear-gradient(90deg, var(--g-hair-gold), rgba(176,141,87,.06) 70%, transparent) 0 0 / 100% 1px no-repeat; }
 html.g .card-foot { padding-top: calc(var(--u) * 1); border-top: 1px dotted var(--g-hair); }
 
@@ -134,6 +136,11 @@ html.g .card-foot { padding-top: calc(var(--u) * 1); border-top: 1px dotted var(
    4. 50日定規 — 丸の行列をやめ、刻みと菱形で（展示室は上部のブラケット）
    ========================================================= */
 html.g #timeline { height: calc(var(--u) * 10.5); }
+/* 定規の下敷き（3Dの床や手すりの上でも読めるよう、紙の帯を敷く） */
+html.g #timeline::before { content: ""; position: absolute; left: -4vw; right: -4vw; bottom: calc(var(--u) * -1.6 - var(--sb)); height: calc(100% + var(--u) * 5);
+  background: linear-gradient(180deg, rgba(245,240,230,0), rgba(245,240,230,.78) 46%, rgba(245,240,230,.9));
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 45%); mask-image: linear-gradient(180deg, transparent, #000 45%); pointer-events: none; }
 html.g #timeline .tl-ruler { opacity: .42; }
 html.g #timeline .tl-tick { opacity: .22; height: 3px; }
 html.g #timeline .tl-tick.wk { height: 6px; opacity: .42; }
@@ -147,14 +154,14 @@ html.g .tl-dot.active::after { width: 16px; height: 16px; border-radius: 1px; tr
 @keyframes g-ring { from { transform: rotate(45deg) scale(.7); opacity: .7; } to { transform: rotate(45deg) scale(1.7); opacity: 0; } }
 html.g .tl-dot:active::before { transform: scale(1.8); }
 html.g #timeline .tl-now { width: 1px; background: var(--g-gold-lo); height: calc(var(--u) * 6.5); }
-html.g #timeline .tl-now::after { color: var(--g-gold-lo); letter-spacing: .12em; }
+html.g #timeline .tl-now::after { display: none; } /* 日付はカードと吹き出しが持つ（ブラケットと重なるため） */
 html.g .tl-tip { background: rgba(27,24,20,.92); padding: 5px 12px 4px; letter-spacing: .08em; box-shadow: 0 8px 18px -10px rgba(0,0,0,.5); }
 html.g .tl-tip::after { content: ""; position: absolute; left: 50%; bottom: -4px; width: 7px; height: 7px; margin-left: -3.5px; background: inherit; transform: rotate(45deg); }
 /* 展示室ブラケット */
-.g-room { position: absolute; top: 0; height: 6px; border: 1px solid var(--g-hair); border-bottom: 0; pointer-events: none;
+.g-room { position: absolute; top: calc(var(--u) * 1.2); height: 6px; border: 1px solid rgba(27,24,20,.32); border-bottom: 0; pointer-events: none;
   transition: border-color .8s, opacity .8s; opacity: .8; }
 .g-room span { position: absolute; left: 50%; top: -.62em; transform: translateX(-50%); padding: 0 .55em; font-family: var(--serif); font-style: italic;
-  font-size: max(9px, calc(var(--u) * 2.15)); line-height: 1; letter-spacing: .14em; color: var(--ink-3);
+  font-size: max(9px, calc(var(--u) * 2.15)); line-height: 1; letter-spacing: .14em; color: var(--ink-2);
   background: transparent; text-shadow: 0 0 4px rgba(247,243,236,1), 0 0 2px rgba(247,243,236,1); white-space: nowrap; }
 .g-room.on { border-color: var(--c); opacity: 1; }
 .g-room.on span { color: var(--ink); font-weight: 600; }
