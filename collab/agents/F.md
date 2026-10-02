@@ -22,3 +22,12 @@ scripts/autosave.sh, scripts/monitor.sh, scripts/patrol.sh, collab/ALERTS.md, si
 - 常駐: scripts/autosave.sh（run_in_background）, scripts/monitor.sh --loop（/tmp/monitor.log）
 - 検査: python3 scripts/patrol.py --report / python3 scripts/shot.py <stop...>（FT_URL で f_preview 等を指定可）
 - 音響の検証: TROUBLESHOOTING [F] の OfflineAudioContext → WAV → analyze_media_content の手順
+
+## 2026-10-02 セッション（F）
+- 役割登録: roles.py join F（W4 は E が先取り済みのため F=環境/QA/監視を担当）。
+- 事故対応: 全員同一作業ツリー＋`git add -A` 系で他人の作業巻き込み／07:22:28Z force-push で記録消失 → **scripts/safe_commit.sh**（パス指定 commit・/tmp/git.lock・force push なし）を追加、TROUBLESHOOTING に記載。
+- shot.py: /tmp/browser.lock 自動 flock（ブラウザ同時1本）。
+- patrol.py: ultra_* の install(ctx) 契約・衝突マーカー・アセット出典の検査を追加（偽ファイルで検出を確認済み）。
+- perf.js: ULTRA 段（既定ON, ?ultra=0 で従来, ?q=ultra で固定）。DPR2/影2048/粒子1.5/aniso16/ssr,taa,volumetricSteps,envRes。降格は <20fps×4秒のみ。node でユニット確認＋実ブラウザでエラー0。
+- **scripts/sweep.py**: 全42ストップ巡回（エラー/NaN/カメラ館外/HUD はみ出し・溢れ・重なり/カウンタ）→ collab/SWEEP.md。初回: 🔴0 / 🟡24（E 担当 UI: .tl-tip 端切れ、#room-title×#card 重なり）。ALERTS と roles msg で E に連絡済み。
+- 次の F: E の修正後に `python3 scripts/sweep.py --report` 再実行。ultra_* 拡張が出揃ったら `?q=ultra` で sweep。
