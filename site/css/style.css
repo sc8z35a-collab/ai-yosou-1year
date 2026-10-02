@@ -221,8 +221,6 @@ body.is-moving .reticle { opacity: 0 !important; }
 /* ---------- 部屋（展示室）の扉絵：章タイトル ---------- */
 #room-title { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; text-align: center; color: var(--ink); opacity: 0; }
 #room-title.show { animation: roomshow 3.6s var(--ease) forwards; }
-#room-title.show.leave { animation: roomleave .5s var(--ease) forwards; }
-@keyframes roomleave { from { opacity: var(--o, 1); transform: none; filter: none; } to { opacity: 0; transform: translateY(-10px) scale(.98); filter: blur(3px); } }
 #room-title .rt-no { font-family: var(--serif); font-style: italic; font-size: max(12px, calc(var(--u) * 3.2)); letter-spacing: .5em; color: var(--c); }
 #room-title .rt-name { margin-top: calc(var(--u) * 1); font-family: var(--serif); font-weight: 500; font-size: calc(var(--u) * 11); letter-spacing: .3em; text-indent: .3em; line-height: 1; }
 #room-title .rt-sub { margin-top: calc(var(--u) * 1.6); font-family: var(--mincho); font-weight: 600; font-size: max(14px, calc(var(--u) * 3.8)); letter-spacing: .4em; color: var(--ink-2); }

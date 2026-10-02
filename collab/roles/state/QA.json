@@ -1,0 +1,12 @@
+{
+ "beat": 1790926657,
+ "id": "QA",
+ "locks": {
+  "collab/qa/REPORT.md": 1790926657,
+  "scripts/qa_e2e.py": 1790926657
+ },
+ "note": "",
+ "role": "結合/回帰テスト自動化・データ整合（scripts/qa_*.py, collab/qa/*）",
+ "seen": [],
+ "task": "E2E回帰テスト scripts/qa_e2e.py"
+}
