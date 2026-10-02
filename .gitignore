@@ -6,3 +6,18 @@ tmp_snaps/
 .agent_id
 .autosave.pid
 __pycache__/
+# [CYBER] 秘密情報ファイルは絶対にコミットしない（リポジトリは public。autosave の git add -A 対策）
+.env
+.env.*
+*.pem
+*.key
+*.p12
+id_rsa*
+id_ed25519*
+.git-credentials
+.genspark_env
+.genspark_llm.yaml
+.dev.vars
+.wrangler/
+*.secret
+secrets/

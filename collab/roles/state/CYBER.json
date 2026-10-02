@@ -1,0 +1,13 @@
+{
+ "beat": 1790926499,
+ "id": "CYBER",
+ "locks": {
+  "scripts/csp_headers.py": 1790926499,
+  "site/_headers": 1790926499,
+  "tools/csp_server.py": 1790926499
+ },
+ "note": "",
+ "role": "サイバー係(2): デプロイ時ブラウザ防御=CSP/セキュリティヘッダ(site/_headers)・秘密ファイル.gitignore・SEC補佐",
+ "seen": [],
+ "task": "CSP/セキュリティヘッダ基盤"
+}
