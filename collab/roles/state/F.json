@@ -1,13 +1,11 @@
 {
- "beat": 1790925998,
+ "beat": 1790927792,
  "id": "F",
  "locks": {
-  "collab/ALERTS.md": 1790925738,
-  "scripts/patrol.py": 1790925738,
-  "site/js/audio.js": 1790925738,
-  "site/js/perf.js": 1790925738
+  "site/js/audio.js": 1790927792,
+  "site/js/perf.js": 1790927792
  },
- "note": "",
+ "note": "sweep/patrol 緑。次: ultra_* 拡張到着後に ?q=ultra で sweep",
  "role": "環境整備/巡回QA/緊急アラート/audio.js・perf.js/scripts",
  "seen": [
   "20261002T071928188_ABYSS_ALL",
