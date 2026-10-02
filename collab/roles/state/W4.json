@@ -1,0 +1,11 @@
+{
+ "beat": 1790926387,
+ "id": "W4",
+ "locks": {
+  "site/js/ultra_w4/index.js": 1790926387
+ },
+ "note": "",
+ "role": "UI/操作/音/データ検証/アクセシビリティ",
+ "seen": [],
+ "task": "章タイトル×キャプション重なり修正(ALERT)+ultra_w4 UI拡張"
+}
