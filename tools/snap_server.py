@@ -8,6 +8,7 @@ import base64, os, sys, http.server, urllib.parse
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'site')
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'tmp_snaps')
 os.makedirs(OUT, exist_ok=True)
+MAX_POST = 25 * 1024 * 1024  # [SEC] スクショ dataURL の上限
 # ?snap=name&wait=秒&stops=1,3,5 : 各stopへgoTo→待機→その場で再描画して即toDataURL（preserveDrawingBuffer不要）
 INJECT = """<script type="module">
 const q = new URLSearchParams(location.search); const name = q.get('snap') || 'snap';
@@ -26,7 +27,9 @@ class H(http.server.SimpleHTTPRequestHandler):
     def do_GET(s):
         u = urllib.parse.urlparse(s.path)
         if (u.path == '/' or u.path.endswith('.html')) and 'snap' in urllib.parse.parse_qs(u.query):
-            fp = os.path.join(ROOT, 'index.html' if u.path == '/' else u.path.lstrip('/'))
+            # [SEC] パストラバーサル対策: site/ 外のファイルは読ませない
+            fp = os.path.realpath(os.path.join(ROOT, 'index.html' if u.path == '/' else urllib.parse.unquote(u.path).lstrip('/')))
+            if not fp.startswith(os.path.realpath(ROOT) + os.sep) or not os.path.isfile(fp): s.send_error(404); return
             html = open(fp, encoding='utf-8').read()
             html = html.replace('</body>', INJECT + '</body>')
             b = html.encode(); s.send_response(200); s.send_header('Content-Type', 'text/html; charset=utf-8')
@@ -36,8 +39,12 @@ class H(http.server.SimpleHTTPRequestHandler):
         u = urllib.parse.urlparse(s.path); q = urllib.parse.parse_qs(u.query)
         if u.path != '/__snap': s.send_error(404); return
         name = ''.join(c for c in q.get('name', ['snap'])[0] if c.isalnum() or c in '-_')[:40]
-        data = s.rfile.read(int(s.headers.get('Content-Length', 0))).decode()
-        b = base64.b64decode(data.split(',', 1)[1])
+        n = int(s.headers.get('Content-Length', 0) or 0)
+        if n <= 0 or n > MAX_POST: s.send_error(413); return   # [SEC] 1GB環境のメモリ枯渇対策
+        data = s.rfile.read(n).decode('ascii', 'replace')
+        if not data.startswith('data:image/') or ',' not in data: s.send_error(400); return
+        try: b = base64.b64decode(data.split(',', 1)[1], validate=True)
+        except Exception: s.send_error(400); return
         open(os.path.join(OUT, name + ('.jpg' if 'jpeg' in data[:30] else '.png')), 'wb').write(b)
         s.send_response(200); s.end_headers(); s.wfile.write(b'ok')
-http.server.ThreadingHTTPServer(('0.0.0.0', int(sys.argv[1]) if len(sys.argv) > 1 else 8090), H).serve_forever()
+http.server.ThreadingHTTPServer((os.environ.get('SNAP_BIND', '0.0.0.0'), int(sys.argv[1]) if len(sys.argv) > 1 else 8090), H).serve_forever()
