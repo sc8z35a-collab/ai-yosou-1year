@@ -73,7 +73,7 @@ export function createUI({ news = [], wings = [], onStart, onNext, onPrev, onSel
     <p><b>操作</b>　右下の黒いボタン／左へスワイプ＝次の展示、白いボタン／右へスワイプ＝前の展示。ドラッグで見回し、ダブルタップで作品に近づく。下部の定規の点をタップすると、その日付の展示へ移動します。キャプションをタップすると折りたためます。</p>
     <p><b>キーボード</b>　<kbd>→</kbd><kbd>←</kbd> <kbd>Space</kbd>　ホイールでも移動できます。</p>
     <p><b>出典</b>　各キャプション右下の出典欄、およびリポジトリの research/ を参照。日付は報道・発表日（米国時間）を基準にしています。</p>
-    <p><b>画像</b>　館内のすべての作品・テクスチャはリアルタイム生成で、外部画像は使用していません。</p>
+    <p><b>画像・素材</b>　館内の装飾・展示はリアルタイム生成に加え、パブリックドメイン／CC0 の素材（The Met Open Access の絵画、Poly Haven のモデル・テクスチャ・HDRI 等）を使用しています。各ニュースの内容と絵画は直接の関係はありません。一覧は <code>site/assets/CREDITS.md</code>。</p>
     <p style="opacity:.6">Built by agents A–F · three.js · WebGL2 · WebAudio</p>`;
 
   // ---------- 章タイトル（展示室の切替時） ----------
@@ -96,7 +96,8 @@ export function createUI({ news = [], wings = [], onStart, onNext, onPrev, onSel
     const tick = el('div', 'tl-tick' + (d.getUTCDay() === 1 ? ' wk' : ''));
     tick.style.left = pos(t) + '%'; timeline.appendChild(tick);
     if (d.getUTCDate() === 1 || t === t0) {
-      const lb = el('div', 'tl-label m', `${MONTH_EN[d.getUTCMonth()]}${t === t0 ? ' ' + d.getUTCDate() : ''}`);
+      // 端のラベルは中央揃えだと画面外にはみ出す → first/last で左/右揃え
+      const lb = el('div', 'tl-label m' + (t === t0 ? ' first' : t + DAY > t1 ? ' last' : ''), `${MONTH_EN[d.getUTCMonth()]}${t === t0 ? ' ' + d.getUTCDate() : ''}`);
       lb.style.left = pos(t) + '%'; timeline.appendChild(lb);
     } else if ([10, 20].includes(d.getUTCDate())) {
       const lb = el('div', 'tl-label', d.getUTCDate()); lb.style.left = pos(t) + '%'; timeline.appendChild(lb);
@@ -128,11 +129,21 @@ export function createUI({ news = [], wings = [], onStart, onNext, onPrev, onSel
     tip.classList.add('show'); clearTimeout(tipTimer); tipTimer = setTimeout(() => tip.classList.remove('show'), 2200);
   }
 
+  // ---------- アクセシビリティ（index.html は A 所有のため実行時に属性を付与） ----------
+  const aria = (sel, label) => { const e = $(sel); if (e) { e.setAttribute('aria-label', label); e.title = label; } };
+  aria('#btn-next', '次の展示へ'); aria('#btn-prev', '前の展示へ');
+  aria('#btn-sound', '音のオン／オフ'); aria('#btn-info', 'この美術館について');
+  timeline.setAttribute('aria-label', '50日間のタイムライン');
+  $('#card')?.setAttribute('aria-live', 'polite');
+  $('#card')?.setAttribute('tabindex', '0');
+  $('#hud-count')?.setAttribute('aria-live', 'polite');
+  $('#about')?.setAttribute('role', 'dialog');
+
   // ---------- ボタン ----------
   const stop = (fn) => (e) => { e.stopPropagation(); try { onTap?.(); } catch {} fn?.(e); };
   $('#btn-next').addEventListener('click', stop(() => onNext?.()));
   $('#btn-prev').addEventListener('click', stop(() => onPrev?.()));
-  $('#btn-sound').addEventListener('click', stop((e) => { const on = onToggleSound?.(); e.currentTarget.classList.toggle('off', on === false); }));
+  $('#btn-sound').addEventListener('click', stop((e) => { const on = onToggleSound?.(); e.currentTarget.classList.toggle('off', on === false); e.currentTarget.setAttribute('aria-pressed', String(on !== false)); }));
   $('#btn-info').addEventListener('click', stop(() => onInfo?.()));
   startBtn?.addEventListener('click', () => onStart?.());
   // UI 上のポインタ操作がキャンバスの見回しに伝播しないように
@@ -159,6 +170,12 @@ export function createUI({ news = [], wings = [], onStart, onNext, onPrev, onSel
   }
 
   let currentWing = null, lastStop = 0;
+  // 章タイトルとキャプションの重なり回避（ALERTS 🟡 F→E）:
+  // 章タイトル表示中に到着したら、タイトルを素早く退場させてからカードを出す。
+  const RT_DUR = 3600, RT_LEAVE = 480;
+  let rtShownAt = -1e9, cardTimer = 0;
+  const titleVisible = () => roomTitle.classList.contains('show') && !roomTitle.classList.contains('leave') && performance.now() - rtShownAt < RT_DUR * 0.9;
+  const reduceMotion = () => matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const api = {
     setLoading(p, label) {
       $('#load-bar').style.transform = `scaleX(${p})`;
@@ -180,9 +197,16 @@ export function createUI({ news = [], wings = [], onStart, onNext, onPrev, onSel
       $('#card-impact').textContent = n.impact ?? '';
       renderSource(n.source);
       renderSummary(n.summary);
-      card.classList.remove('show'); void card.offsetWidth; card.classList.add('show');
+      card.setAttribute('aria-label', `${fmtDate(n.date)} ${n.org ?? ''} ${n.title ?? ''}`);
+      clearTimeout(cardTimer);
+      card.classList.remove('show'); void card.offsetWidth;
+      const reveal = () => { card.classList.add('show'); };
+      if (titleVisible() && !reduceMotion()) {
+        roomTitle.classList.add('leave');
+        cardTimer = setTimeout(reveal, RT_LEAVE);
+      } else reveal();
     },
-    hideNews() { card.classList.remove('show'); },
+    hideNews() { clearTimeout(cardTimer); card.classList.remove('show'); },
     toggleCard() { card.classList.toggle('collapsed'); },
     setStop(stopIndex, total, wing) {
       const exIdx = stopIndex - 1; // stop 0 = 入口
@@ -213,7 +237,10 @@ export function createUI({ news = [], wings = [], onStart, onNext, onPrev, onSel
             const range = wing.range ?? wing.sub ?? '';
             roomTitle.style.setProperty('--c', c);
             roomTitle.innerHTML = `<div class="rt-inner"><div class="rt-no">ROOM ${ROMAN[wi + 1] || wi + 1}</div><div class="rt-name">${esc(wing.name)}</div>${wing.sub ? `<div class="rt-sub">${esc(wing.sub)}</div>` : ''}${wing.range ? `<div class="rt-range">${esc(range)}</div>` : ''}</div>`;
-            roomTitle.classList.remove('show'); void roomTitle.offsetWidth; roomTitle.classList.add('show');
+            roomTitle.classList.remove('show', 'leave'); void roomTitle.offsetWidth; roomTitle.classList.add('show');
+            rtShownAt = performance.now();
+            // キャプションが出ている最中に章が変わった場合はカードを先に下げる
+            clearTimeout(cardTimer); card.classList.remove('show');
           }
           currentWing = wing.id;
         }
@@ -223,7 +250,7 @@ export function createUI({ news = [], wings = [], onStart, onNext, onPrev, onSel
     setProgress(p) { $('#progress').style.transform = `scaleX(${Math.max(0, Math.min(1, p))})`; },
     showFinale(on) {
       document.body.classList.toggle('is-finale', on);
-      if (on) { card.classList.remove('show'); roomTitle.classList.remove('show'); }
+      if (on) { clearTimeout(cardTimer); card.classList.remove('show'); roomTitle.classList.remove('show', 'leave'); }
     },
     toast(msg) {
       const t = $('#toast'); t.textContent = msg; t.classList.remove('show'); void t.offsetWidth; t.classList.add('show');

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>UI harness (E) — WebGL無しでHUD/キャプション/章タイトルを検証</title>
+<link rel="stylesheet" href="../css/style.css"/>
+<style>body{background:linear-gradient(#d9d3c9,#bfb7aa)}</style>
+</head><body>
+<!-- Owner: E. index.html の HUD DOM の写し（scripts で再生成可）。?stop=8 で到着状態、?seq=7,8 で遷移を再現 -->
+<div id="intro">
+    <div class="grid"></div>
+    <div class="intro-inner">
+      <h1 class="logo"><span>FLAT</span> <span>TRAIL</span></h1>
+      <p class="tagline">THE MUSEUM OF AI HEADLINES</p>
+      <p class="tagline-jp">AIが世界を変えた24の瞬間 — 2022 → 2026</p>
+      <div class="loader">
+        <div class="load-track"><div id="load-bar"></div></div>
+        <div class="load-meta"><span id="load-label">INITIALIZING</span><span id="load-pct">000</span></div>
+      </div>
+      <button id="btn-start">ENTER THE TRAIL</button>
+      <p class="hint">タップで全画面・横向きで入館 ／ スワイプ・ボタンで移動、ドラッグで見回し</p>
+    </div>
+  </div>
+
+  <div id="rotate">
+    <div>
+      <div class="phone"></div>
+      <p>端末を<b>横向き</b>にしてください</p>
+      <small>LANDSCAPE ONLY</small>
+    </div>
+  </div>
+
+  <div id="hud">
+    <div id="progress-wrap"><div id="progress"></div></div>
+    <div class="hud-top">
+      <div class="brand">FLAT TRAIL<small>AI HEADLINES MUSEUM</small></div>
+      <div id="hud-wing" data-id=""></div>
+      <div class="hud-right">
+        <span id="hud-count">00 / 24</span>
+        <button class="icon-btn" id="btn-sound" aria-label="sound">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7"/><path d="M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-info" aria-label="info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="reticle"></div>
+
+    <article id="card">
+      <div class="card-head"><span id="card-no">01</span><span id="card-date"></span><span id="card-cat"></span></div>
+      <div id="card-org"></div>
+      <h2 id="card-title"></h2>
+      <div id="card-en"></div>
+      <p id="card-summary"></p>
+      <div class="card-foot"><span>IMPACT // <b id="card-impact"></b></span><span>SRC: <span id="card-src"></span></span></div>
+    </article>
+
+    <div id="finale">
+      <div class="f-inner"><button id="btn-restart">↺ RESTART THE TRAIL</button></div>
+    </div>
+
+    <nav id="timeline"></nav>
+    <div class="nav">
+      <button id="btn-prev" aria-label="previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button id="btn-next" aria-label="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <div id="toast"></div>
+  </div>
+
+  <div id="about">
+    <div class="box">
+      <h2>FLAT TRAIL</h2>
+      <p>2022年の生成AIの夜明けから2026年の「出さない」という決断まで、AIの重大ニュース24件を5つのウィングで巡る3D美術館です。</p>
+      <p>操作: 右ボタン/左スワイプ = 次へ、左ボタン/右スワイプ = 前へ、ドラッグ = 見回し、カードをタップ = 折りたたみ、ドットタップ = ジャンプ。</p>
+      <p>キーボード: <kbd>→</kbd><kbd>←</kbd> / <kbd>Space</kbd></p>
+      <p>出典は各展示の SRC 欄および リポジトリの research/ を参照。画像はすべてリアルタイム生成（外部画像不使用）。</p>
+      <p style="opacity:.6">Built by Agents A–F · three.js r186 · WebGL2 · WebAudio</p>
+    </div>
+  </div>
+
+  
+<script type="module">
+import { NEWS, WINGS } from '../js/data/news.js';
+import { createUI } from '../js/ui.js';
+const q = new URLSearchParams(location.search);
+const total = NEWS.length + 2;
+const wingOf = (i) => i <= 0 ? { id:'intro', name:'ENTRANCE', sub:'入館', color:'#c9a46a' }
+  : i > NEWS.length ? { id:'end', name:'EPILOGUE', sub:'そして、次の50日へ', color:'#c9a46a' }
+  : WINGS.find(w => w.id === NEWS[i-1].wing);
+let cur = 0;
+const go = (i) => { i = Math.max(0, Math.min(total-1, i)); ui.hideNews(); ui.setStop(i, total, wingOf(i));
+  setTimeout(() => { if (i>0 && i<=NEWS.length) ui.showNews(NEWS[i-1]); ui.showFinale(i===total-1); }, +(q.get('walk') ?? 900)); cur = i; };
+const ui = createUI({ news: NEWS, wings: WINGS, onNext: () => go(cur+1), onPrev: () => go(cur-1), onSelect: go,
+  onInfo: () => document.getElementById('about').classList.toggle('show'), onToggleSound: () => true, onStart: () => ui.started() });
+ui.setLoading(1, 'READY'); ui.ready(); ui.started();
+window.__UI = { ui, go, NEWS, WINGS };
+const seq = (q.get('seq') || q.get('stop') || '').split(',').filter(Boolean).map(Number);
+(async () => { for (const s of seq) { go(s); await new Promise(r => setTimeout(r, 2600)); } })();
+</script></body></html>

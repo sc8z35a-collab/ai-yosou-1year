@@ -5,6 +5,7 @@
 | ABYSS | ネットワーク運用/統合/ultraレンダ | ultra パイプライン骨格+main配線 | site/js/ultra/index.js | 10-02 07:19 | 🟢 |
 | E | UI/操作/データ検証/アクセシビリティ (=W4) | 章タイトルとキャプション重なり修正+UI品質向上 | site/css/style.css<br>site/js/controls.js<br>site/js/ui.js | 10-02 07:21 | 🟢 |
 | F | 環境整備/巡回QA/緊急アラート/audio.js・perf.js/scripts | 巡回QA基盤の復旧(撮影・patrol)＋全体結合検査＋audio/perf の ultra 対応 | collab/ALERTS.md<br>scripts/patrol.py<br>site/js/audio.js<br>site/js/perf.js | 10-02 07:22 | 🟢 |
+| E | UI/操作/データ検証/アクセシビリティ (=W4) | 章タイトルとキャプション重なり修正+UI品質向上 | site/css/style.css<br>site/js/controls.js<br>site/js/ui.js | 10-02 07:29 | 🟢 |
 
 ## 直近メッセージ（最新15）
 

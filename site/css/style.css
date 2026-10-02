@@ -187,6 +187,11 @@ body.is-started #hud { opacity: 1; }
 #timeline .tl-tick.wk { height: 8px; opacity: .6; }
 #timeline .tl-label { position: absolute; bottom: 0; transform: translateX(-50%); font-family: var(--serif); font-size: max(9.5px, calc(var(--u) * 2.3)); letter-spacing: .16em; color: var(--ink-3); white-space: nowrap; }
 #timeline .tl-label.m { color: var(--ink); font-weight: 600; letter-spacing: .26em; }
+#timeline .tl-label.first { transform: none; }
+#timeline .tl-label.last { transform: translateX(-100%); }
+/* キーボード操作時のみ真鍮のフォーカスリング */
+#hud button:focus-visible, #intro button:focus-visible, #card:focus-visible, #card-src a:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+#hud button:focus:not(:focus-visible), #card:focus:not(:focus-visible) { outline: none; }
 #timeline .tl-now { position: absolute; bottom: calc(var(--u) * 3.2); width: 1px; height: calc(var(--u) * 5); background: var(--brass); transform: translateX(-.5px); transition: left 1.2s var(--ease); }
 #timeline .tl-now::after { content: attr(data-d); position: absolute; left: 6px; top: -2px; font-family: var(--serif); font-style: italic; font-size: max(10px, calc(var(--u) * 2.4)); color: var(--brass); white-space: nowrap; }
 #timeline .tl-fill { position: absolute; left: 0; bottom: calc(var(--u) * 3.2); height: 2px; margin-bottom: -.5px; background: var(--brass); transform-origin: left; transition: width 1.2s var(--ease); }
@@ -216,6 +221,9 @@ body.is-moving .reticle { opacity: 0 !important; }
 #room-title .rt-sub { margin-top: calc(var(--u) * 1.6); font-family: var(--mincho); font-weight: 600; font-size: max(14px, calc(var(--u) * 3.8)); letter-spacing: .4em; color: var(--ink-2); }
 #room-title .rt-range { margin-top: calc(var(--u) * 1.2); font-family: var(--serif); font-size: max(11px, calc(var(--u) * 2.8)); letter-spacing: .3em; color: var(--ink-3); }
 #room-title .rt-inner { padding: calc(var(--u) * 3) calc(var(--u) * 8); background: radial-gradient(closest-side, rgba(247,243,236,.85), rgba(247,243,236,0)); }
+/* キャプション到着時の早退場（親のアニメは継続、中身だけ .48s でフェード） */
+#room-title .rt-inner { transition: opacity .48s var(--ease), transform .48s var(--ease), filter .48s; }
+#room-title.leave .rt-inner { opacity: 0; transform: translateY(calc(var(--u) * -3)); filter: blur(3px); }
 @keyframes roomshow { 0% { opacity: 0; transform: translateY(8px); filter: blur(4px); } 18%, 70% { opacity: 1; transform: none; filter: none; } 100% { opacity: 0; transform: translateY(-6px); filter: blur(3px); } }
 
 /* ---------- フィナーレ ---------- */
