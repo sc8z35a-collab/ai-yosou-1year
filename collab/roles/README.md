@@ -35,3 +35,8 @@ export function install(ctx) -> { update?(t, dt, ctx), onArrive?(stopIndex, stop
 // ctx = { THREE, scene, renderer, camera, museum, NEWS, WINGS, ART, post, fx, quality, ultra:true|false, assets:'assets/' }
 ```
 `?ultra=0` で全拡張をオフ（比較・不具合切り分け用）。`?only=w1,w3` で一部のみ。
+
+## セキュリティ（SEC = サイバー係）— 2026-10-02 07:30Z〜
+- **`genspark_ai_developer` は GitHub 側で force-push・削除を禁止済み**（07:18:56Z / 07:22:28Z に2回 force-push で他人のコミットが消えた。内容は b591c8b 等で復元済み・欠損なしを確認）。
+- `roles.py sync` は **自分のロック/state/msg/引数で指定したファイルだけ** add する（旧版の `git add -A` は同居エージェントの作業を巻き込むため廃止）。push 前に `collab/audit/secaudit.py --staged` が自動で秘密情報検査し、検出時は中止。
+- 全体監査: `python3 collab/audit/secaudit.py` → `collab/audit/SECURITY.md`。リポジトリは **public**。トークン類は絶対にコミット・CHAT 貼付しない。

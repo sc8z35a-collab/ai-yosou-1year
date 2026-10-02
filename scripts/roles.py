@@ -14,7 +14,7 @@
   python3 scripts/roles.py who   <file>                    そのファイルの所有者/ロック保持者
   python3 scripts/roles.py board                           ダッシュボード生成 + 表示
   python3 scripts/roles.py check                           ステージ済み変更がロック/所有権に違反しないか検査（push前）
-  python3 scripts/roles.py sync  <ID> ["commit msg"]       add→commit→pull --rebase(自動解決)→push を1発で
+  python3 scripts/roles.py sync  <ID> ["commit msg"] [file...]  自分のロック/state/msg+指定ファイルのみ add→secaudit→commit→rebase→push
 ロックは TTL 45分（ハートビートで延長）。期限切れロックは自動的に無効。
 """
 import json, os, sys, time, subprocess, glob, re, fnmatch, datetime as dt
@@ -25,6 +25,7 @@ SD, MD = os.path.join(RD, 'state'), os.path.join(RD, 'msg')
 TTL = 45 * 60
 # 既存の所有権（collab/README.md の表 + 後続の合意）。glob → ID
 OWNERS = [
+    ('collab/audit/secaudit.py', 'SEC'), ('collab/audit/SECURITY.md', 'SEC'),
     ('site/js/main.js', 'A'), ('site/js/post.js', 'A'), ('site/index.html', 'A'), ('site/js/data/art.js', 'A'),
     ('site/js/exhibit.js', 'B'), ('site/js/lightpool.js', 'B'),
     ('site/js/data/news.js', 'C'), ('site/js/museum.js', 'C'),
@@ -36,8 +37,8 @@ OWNERS = [
 APPEND_ONLY = ['collab/CHAT.md', 'collab/TROUBLESHOOTING.md', 'collab/BOARD.md', 'collab/agents/*', 'collab/roles/msg/*']
 
 def now(): return int(time.time())
-def iso(t=None): return dt.datetime.utcfromtimestamp(t or now()).strftime('%Y-%m-%dT%H:%M:%SZ')
-def hm(t): return dt.datetime.utcfromtimestamp(t).strftime('%m-%d %H:%M')
+def iso(t=None): return dt.datetime.fromtimestamp(t or now(), dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+def hm(t): return dt.datetime.fromtimestamp(t, dt.timezone.utc).strftime('%m-%d %H:%M')
 def sh(*a, check=False):
     r = subprocess.run(a, cwd=ROOT, capture_output=True, text=True)
     if check and r.returncode: print(r.stdout + r.stderr); sys.exit(r.returncode)
@@ -86,7 +87,7 @@ def cmd_beat(i, note=''):
     save(s); print('♥', i, iso())
 def cmd_say(fr, to, *body):
     ensure(); text = ' '.join(body).strip()
-    fn = os.path.join(MD, f'{dt.datetime.utcnow().strftime("%Y%m%dT%H%M%S%f")[:-3]}_{fr}_{to.replace(",", "+")}.md')
+    fn = os.path.join(MD, f'{dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S%f")[:-3]}_{fr}_{to.replace(",", "+")}.md')
     open(fn, 'w').write(f'from: {fr}\nto: {to}\nat: {iso()}\n\n{text}\n'); print('sent →', os.path.relpath(fn, ROOT))
 def msgs():
     out = []
@@ -135,9 +136,18 @@ def cmd_check(i=None):
             src = open(os.path.join(ROOT, f), encoding='utf-8', errors='ignore').read()
             if '<<<<<<<' in src or '>>>>>>>' in src: print(f'🔴 {f} に衝突マーカー'); bad += 1
     print('check:', 'NG' if bad else 'OK'); return bad
-def cmd_sync(i, msg=''):
+def my_paths(i, extra=()):
+    """sync で add してよいパス = 自分のロック + 自分の state/msg + DASHBOARD + 明示指定。git add -A は他人の作業を巻き込むので禁止（CHAT 07:23 B ルール）。"""
+    ps = set(load(i).get('locks', {})) | {os.path.relpath(sp(i), ROOT), 'collab/roles/DASHBOARD.md'} | set(map(norm, extra))
+    ps |= {os.path.relpath(p, ROOT) for p in glob.glob(os.path.join(MD, f'*_{i}_*.md'))}
+    return sorted(p for p in ps if os.path.exists(os.path.join(ROOT, p)) or sh('git', 'ls-files', '--error-unmatch', p).returncode == 0)
+def cmd_sync(i, msg='', *extra):
     cmd_beat(i); cmd_board()
-    sh('git', 'add', '-A')
+    paths = my_paths(i, extra)
+    if paths: sh('git', 'add', '-A', '--', *paths)
+    if os.path.exists(os.path.join(ROOT, 'collab/audit/secaudit.py')):
+        r = sh('python3', 'collab/audit/secaudit.py', '--staged')
+        if r.returncode: print(r.stdout + r.stderr); print('✗ secaudit が秘密情報を検出。sync 中止'); sys.exit(3)
     if sh('git', 'diff', '--cached', '--quiet').returncode:
         sh('git', 'commit', '-q', '--no-verify', '-m', msg or f'sync({i}): {iso()}')
     for t in range(4):
@@ -152,7 +162,7 @@ def cmd_sync(i, msg=''):
                 else: sh('git', 'checkout', '--ours', '--', f)   # rebase中 ours=リモート → リモート優先
                 sh('git', 'add', f)
             os.environ['GIT_EDITOR'] = 'true'; sh('git', 'rebase', '--continue')
-        if sh('git', 'push', '-q', 'origin', 'HEAD:genspark_ai_developer').returncode == 0:
+        if sh('git', 'push', '-q', 'origin', 'HEAD:genspark_ai_developer').returncode == 0:   # 非 force のみ（shared は保護済み）
             print('✓ synced', sh('git', 'log', '-1', '--format=%h %s').stdout.strip()); return
         time.sleep(3 + t * 4)
     print('✗ push failed (4x)'); sys.exit(1)
