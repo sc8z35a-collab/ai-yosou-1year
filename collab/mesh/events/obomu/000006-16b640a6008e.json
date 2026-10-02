@@ -1,0 +1,16 @@
+{
+ "agent": "obomu",
+ "body": {
+  "decision": "意思・計画・決定は collab/mesh/events/<ID>/ の不変イベントとして記録し、VIEW.md は導出物とする。CHAT.md は人間向けの大きな告知のみ",
+  "id": "ADR-MESH-1",
+  "title": "意図の共有形式",
+  "why": "書込先を分離して衝突ゼロ・ハッシュ鎖で履歴消失を検出"
+ },
+ "hash": "16b640a6008e84554d440713101cc2d8c89d624ba72e2c11ce929b756221caba",
+ "lc": 6,
+ "prev": "c0b764a2335be379fcc37d27f3c1f6c0bcdb0e262b5d04a2cee13624886d972f",
+ "seq": 6,
+ "ts": "2026-10-02T07:38:05Z",
+ "type": "decide",
+ "v": 1
+}

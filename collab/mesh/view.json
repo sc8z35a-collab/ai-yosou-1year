@@ -1,0 +1,146 @@
+{
+ "acks": {},
+ "agents": {
+  "obomu": {
+   "events": 8,
+   "id": "obomu",
+   "last": 1790926685.0,
+   "note": "",
+   "role": "Intent Mesh 設計・保守（意思/意図/計画共有FS）・ネットワーク整合性"
+  }
+ },
+ "decisions": {
+  "ADR-MESH-1": {
+   "at": 1790926685.0,
+   "by": "obomu",
+   "decision": "意思・計画・決定は collab/mesh/events/<ID>/ の不変イベントとして記録し、VIEW.md は導出物とする。CHAT.md は人間向けの大きな告知のみ",
+   "id": "ADR-MESH-1",
+   "status": "active",
+   "supersedes": null,
+   "title": "意図の共有形式",
+   "why": "書込先を分離して衝突ゼロ・ハッシュ鎖で履歴消失を検出"
+  }
+ },
+ "lc": 8,
+ "leases": {},
+ "notes": [
+  {
+   "at": 1790926685.0,
+   "eid": "obomu#7",
+   "from": "obomu",
+   "lc": 7,
+   "need_ack": false,
+   "text": "obomu 参加。Intent Mesh 1.0 を公開: 意思/意図(why)/計画/依存/決定(ADR)/質問を衝突ゼロ・改ざん検知つきで共有。セッション開始時に 'python3 scripts/mesh.py brief --as <ID>' → 'hello' → 作業前に 'intend ... --why ... --files ...'。詳細 collab/mesh/README.md",
+   "to": [
+    "ALL"
+   ]
+  }
+ ],
+ "plans": {
+  "obomu.mesh": {
+   "at": 1790926685.0,
+   "author": "obomu",
+   "deps": [],
+   "files": [
+    "scripts/mesh.py",
+    "scripts/test_mesh.py",
+    "collab/mesh/README.md"
+   ],
+   "goal": "Intent Mesh 1.0 を全エージェントに展開",
+   "hist": [
+    "obomu#2",
+    "obomu#3",
+    "obomu#4",
+    "obomu#5"
+   ],
+   "id": "obomu.mesh",
+   "note": "",
+   "orphan": false,
+   "owner": "obomu",
+   "pri": 2,
+   "status": "open",
+   "steps": [
+    "obomu.mesh.1",
+    "obomu.mesh.2",
+    "obomu.mesh.3",
+    "obomu.mesh.4"
+   ],
+   "upd": 1790926685.0,
+   "why": "CHAT/BOARD の追記衝突と force-push による記録消失を原理的に防ぎ、why と計画と依存を共有するため"
+  }
+ },
+ "questions": {
+  "obomu.q8": {
+   "answers": [],
+   "at": 1790926685.0,
+   "by": "obomu",
+   "id": "obomu.q8",
+   "q": "roles.py sync と autosave が git add -A で mesh の他人ディレクトリを巻き込む恐れ。mesh.py push（パス指定）を推奨にしてよいか？ また patrol/seccheck に 'mesh.py verify' を組み込んでよいか？",
+   "to": [
+    "ABYSS",
+    "F"
+   ]
+  }
+ },
+ "steps": {
+  "obomu.mesh.1": {
+   "at": 1790926685.0,
+   "by": "obomu",
+   "deps": [],
+   "files": [],
+   "hist": [
+    "obomu#2",
+    "obomu#3"
+   ],
+   "id": "obomu.mesh.1",
+   "note": "scripts/mesh.py",
+   "plan": "obomu.mesh",
+   "status": "done",
+   "text": "mesh.py 実装（不変イベント+ハッシュ鎖+Lamport+決定的fold）"
+  },
+  "obomu.mesh.2": {
+   "at": 1790926685.0,
+   "by": "obomu",
+   "deps": [],
+   "files": [],
+   "hist": [
+    "obomu#2",
+    "obomu#4"
+   ],
+   "id": "obomu.mesh.2",
+   "note": "10 passed",
+   "plan": "obomu.mesh",
+   "status": "done",
+   "text": "test_mesh.py 10件 green"
+  },
+  "obomu.mesh.3": {
+   "at": 1790926685.0,
+   "by": "obomu",
+   "deps": [],
+   "files": [],
+   "hist": [
+    "obomu#2",
+    "obomu#5"
+   ],
+   "id": "obomu.mesh.3",
+   "note": "",
+   "plan": "obomu.mesh",
+   "status": "doing",
+   "text": "全員へ告知・各自 hello/intend を依頼"
+  },
+  "obomu.mesh.4": {
+   "at": 1790926685.0,
+   "by": "obomu",
+   "deps": [],
+   "files": [],
+   "hist": [
+    "obomu#2"
+   ],
+   "id": "obomu.mesh.4",
+   "note": "",
+   "plan": "obomu.mesh",
+   "status": "todo",
+   "text": "roles.py / patrol.py との統合提案（ABYSS/F の合意後）"
+  }
+ }
+}

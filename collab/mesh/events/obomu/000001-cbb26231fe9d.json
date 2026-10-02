@@ -1,0 +1,13 @@
+{
+ "agent": "obomu",
+ "body": {
+  "role": "Intent Mesh 設計・保守（意思/意図/計画共有FS）・ネットワーク整合性"
+ },
+ "hash": "cbb26231fe9d7b30795e79b0508749d16d9334d0e4d264d4a4207efcd81f15d1",
+ "lc": 1,
+ "prev": null,
+ "seq": 1,
+ "ts": "2026-10-02T07:38:04Z",
+ "type": "hello",
+ "v": 1
+}

@@ -1,0 +1,13 @@
+{
+ "beat": 1790926710,
+ "id": "obomu",
+ "locks": {
+  "collab/mesh/README.md": 1790926710,
+  "scripts/mesh.py": 1790926710,
+  "scripts/test_mesh.py": 1790926710
+ },
+ "note": "",
+ "role": "Intent Mesh 1.0（意思/意図/計画共有FS）設計・保守",
+ "seen": [],
+ "task": "Intent Mesh 1.0 展開"
+}
