@@ -5,7 +5,7 @@ selftest.js が「例外・NaN」を見るのに対し、こちらは **来館�
   1. データ整合   : NEWS 件数=展示数=タイムライン点数、日付が50日窓内・昇順、source が http(s)、wing が WINGS に存在
   2. キャプション : 到着後のカード番号/日付/タイトルが NEWS[i] と一致、カードが画面内、本文の見切れ(clip)
   3. 重なり       : 章タイトル(.rt-inner 実効不透明度)とカードが同時に見えて矩形が交差していない
-  4. HUD          : prev/next の disabled 状態、#hud-count、HUD 要素同士の矩形交差
+  4. HUD          : prev/next の disabled 状態、#hud-count、HUD 要素同士の矩形交差、ツールチップ等の画面外はみ出し
   5. フィナーレ   : 最終 stop で body.is-finale、カード非表示
   6. エラー       : pageerror / console.error 0
 使い方:
@@ -14,14 +14,57 @@ selftest.js が「例外・NaN」を見るのに対し、こちらは **来館�
   FT_URL='http://localhost:8080/?autostart&q=low&ultra=0' python3 scripts/qa_e2e.py
   --report で collab/qa/REPORT.md に書き出し。--shots で失敗 stop の PNG を /tmp/qa/ に保存。
 前提: site を 8080 で配信中。ブラウザは /tmp/browser.lock で全員1本に直列化（shot.py と同じ規約）。
-終了コード: 0=PASS / 1=FAIL / 2=起動失敗
+安全装置: 空きメモリ < QA_MIN_MB(110) か QA_MAX_SEC(1500) 超過で chromium を kill（1GB 共有 sandbox の凍結防止）
+終了コード: 0=PASS / 1=FAIL / 2=起動失敗 / 3=watchdog
 """
-import sys, os, json, asyncio, fcntl, time, datetime as dt
+import sys, os, json, asyncio, fcntl, time, signal, threading, datetime as dt
+
+sys.stdout.reconfigure(line_buffering=True)   # リダイレクト時も1行ずつ出す（固まった位置が分かる）
+MIN_AVAIL_MB = int(os.environ.get('QA_MIN_MB', '110'))   # これを下回ったらブラウザを kill（sandbox 凍結防止）
+MAX_SEC = int(os.environ.get('QA_MAX_SEC', '1500'))      # 全体の上限
+
+
+def mem_avail_mb():
+    try:
+        for line in open('/proc/meminfo'):
+            if line.startswith('MemAvailable:'): return int(line.split()[1]) // 1024
+    except Exception: pass
+    return 10 ** 6
+
+
+def kill_tree(root):
+    """root の子孫プロセス（playwright driver → chromium 全プロセス）を SIGKILL。
+    os._exit だけだと driver が先に死んで chromium が孤児化し、メモリを握ったまま残る（実測 460MB）。"""
+    kids = {}
+    for d in os.listdir('/proc'):
+        if d.isdigit():
+            try: kids.setdefault(int(open(f'/proc/{d}/stat').read().rsplit(')', 1)[1].split()[1]), []).append(int(d))
+            except Exception: pass
+    todo, out = [root], []
+    while todo:
+        for c in kids.get(todo.pop(), []): out.append(c); todo.append(c)
+    for pid in out:
+        try: os.kill(pid, signal.SIGKILL)
+        except Exception: pass
+
+
+def watchdog():
+    """1GB 共有 sandbox では chromium がメモリを食い尽くすと全エージェントが凍結する。
+    残メモリが閾値を割る / 制限時間超過 → 自分の chromium 子プロセスごと kill して終了。"""
+    t0 = time.time()
+    while True:
+        time.sleep(2)
+        a = mem_avail_mb()
+        if a < MIN_AVAIL_MB or time.time() - t0 > MAX_SEC:
+            why = f'MemAvailable {a}MB < {MIN_AVAIL_MB}MB' if a < MIN_AVAIL_MB else f'timeout {MAX_SEC}s'
+            print(f'✗ WATCHDOG: {why} → ブラウザを強制終了', flush=True)
+            kill_tree(os.getpid())
+            os._exit(3)
 
 ARGS = [a for a in sys.argv[1:] if not a.startswith('--')]
 REPORT = '--report' in sys.argv
 SHOTS = '--shots' in sys.argv
-URL = os.environ.get('FT_URL', 'http://localhost:8080/?autostart&q=low')
+URL = os.environ.get('FT_URL', 'http://localhost:8080/?autostart&q=low&ultra=0')
 DWELL = int(os.environ.get('QA_DWELL', '1400'))   # 到着後の待ち(ms)。カード表示 .7s + 章タイトル退場 .5s を超える値
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -68,8 +111,15 @@ PROBE = r'''(i) => {
     const A = R(hud[a][1]), B = R(hud[b][1]), s = area(A, B);
     if (s > 0.15 * Math.min(A.w * A.h, B.w * B.h)) out.warn.push(`HUD overlap ${hud[a][0]} × ${hud[b][0]} (${s | 0}px²)`);
   }
+  // 画面外はみ出し: 可視の HUD 系テキスト（ツールチップ・章タイトル・HUD）が viewport から出ていないか
+  for (const sel of ['.tl-tip.show', '#hud-wing', '#hud-count', '#room-title.show .rt-inner']) {
+    const e = $(sel); if (!e || op(e) < 0.3) continue; const r = R(e);
+    if (r.l < -1 || r.r > W + 1 || r.t < -1 || r.b > H + 1) out.issues.push(`${sel} off-screen (l=${r.l | 0}, r=${r.r | 0} / ${W})`);
+  }
   const p = FT.camera.position; if (![p.x, p.y, p.z].every(Number.isFinite)) out.issues.push('camera NaN');
   out.calls = FT.renderer.info.render.calls;
+  out.tex = FT.renderer.info.memory.textures; out.geo = FT.renderer.info.memory.geometries;
+  out.heap = performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null;
   return out;
 }'''
 
@@ -106,8 +156,11 @@ async def main():
         print('… 他エージェントがブラウザ使用中。/tmp/browser.lock 待ち', flush=True); fcntl.flock(lk, fcntl.LOCK_EX)
     t0 = time.time(); errs = []; results = []
     async with async_playwright() as p:
-        b = await p.chromium.launch(args=['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader',
-                                          '--disable-dev-shm-usage', '--no-sandbox', '--js-flags=--max-old-space-size=256'])
+        if mem_avail_mb() < MIN_AVAIL_MB + 250:
+            print(f'✗ 空きメモリ不足 ({mem_avail_mb()}MB)。他のブラウザ/重い処理の終了を待ってから再実行'); return 2, None, []
+        b = await p.chromium.launch(args=['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--qa-e2e',
+                                          '--disable-dev-shm-usage', '--no-sandbox', '--renderer-process-limit=1',
+                                          '--disable-gpu-shader-disk-cache', '--js-flags=--max-old-space-size=256'])
         try:
             pg = await b.new_page(viewport={'width': 844, 'height': 390}, device_scale_factor=1, has_touch=True, is_mobile=True)
             pg.on('pageerror', lambda e: errs.append('PAGEERROR ' + str(e)[:300]))
@@ -138,7 +191,7 @@ async def main():
                 if len(errs) > e0: r['issues'] += errs[e0:]
                 results.append(r)
                 mark = '✗' if r['issues'] else ('△' if r['warn'] else '✓')
-                print(f"{mark} stop {s:02d} {r['kind']:<8} card={r['cardOp']} title={r['rtOp']} calls={r['calls']} " +
+                print(f"{mark} stop {s:02d} mem={mem_avail_mb()}MB {r['kind']:<8} card={r['cardOp']} title={r['rtOp']} tex={r['tex']} heap={r['heap']}MB " +
                       ' | '.join(r['issues'] + r['warn'])[:260], flush=True)
                 if SHOTS and (r['issues'] or r['warn']): await pg.screenshot(path=f'/tmp/qa/stop_{s:02d}.png')
         finally:
@@ -168,6 +221,7 @@ def write_report(code, data, results):
 
 
 if __name__ == '__main__':
+    threading.Thread(target=watchdog, daemon=True).start()
     code, data, results = asyncio.run(main())
     if REPORT and data: write_report(code, data, results)
     sys.exit(code)

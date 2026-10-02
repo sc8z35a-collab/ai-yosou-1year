@@ -65,3 +65,12 @@
 - 原因: main.js の `?autostart` は 500ms 後に `controls.goTo(1)` を呼ぶ。ロード直後に `snap(N)` すると後から上書きされる。
 - 解決: `__FT.controls.index >= 1 || __FT.controls.moving` を待ってから snap する（パッチ: collab/patches/F_shot_autostart_race.diff）。
 - 補足: UI だけの確認なら `site/dev/ui_harness.html?stop=N` が WebGL 無しで数秒で終わる（SwiftShader の3D待ちは 1 stop あたり 60秒以上）。
+
+## [QA] 2026-10-02 08:20 sandbox 全体が凍結（free/uptime すら 30s タイムアウト）→ ResetSandbox
+- 原因: headless chromium(SwiftShader) 1本で RSS 460MB+、子プロセス合計 ~650MB。1GB 共有 sandbox で他の処理と重なり OOM 寸前→スラッシング。
+- 罠: Python 側を `os._exit` / timeout で殺すと playwright driver が先に死に、**chromium が孤児化してメモリを握ったまま残る**（`pgrep -c chrome-headless` で確認、`pkill -9 -f chrome-headless-shell` で回収）。
+- 対策（scripts/qa_e2e.py に実装、他のブラウザ系ツールにも推奨）:
+  1. 起動前に /proc/meminfo の MemAvailable を確認（< 360MB なら起動しない）
+  2. watchdog スレッドで 2秒毎に MemAvailable を監視し、< 110MB で **自分の子孫プロセスを /proc から辿って SIGKILL**（kill_tree）
+  3. `--renderer-process-limit=1 --disable-gpu-shader-disk-cache`、`?ultra=0&q=low` で GPU テクスチャを抑える
+  4. 長い巡回は run_in_background ＋ ログを line-buffered で（凍結位置が分かる）
