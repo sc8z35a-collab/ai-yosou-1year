@@ -1,0 +1,217 @@
+/* ultra_g.css — Owner: G（デザイン総監修）
+   既存 style.css(E) の上に重ねる「デザインレイヤ」。html.g のときだけ効く（?g=0 で無効化＝比較用）。
+   Art direction: 「国立美術館の特別展」— 象牙の紙・墨・真鍮・朱印。装飾は線と余白で語る。発光/ネオン禁止。
+   グリッド: 横画面 844×390 を基準に 12 カラム / 余白 4vw。タイポ: Cormorant Garamond(欧文) × Shippori Mincho(和文)。 */
+
+html.g {
+  --g-gold: #b08d57;
+  --g-gold-hi: #d8bf8f;
+  --g-gold-lo: #7d6136;
+  --g-vermilion: #a5402d;
+  --g-paper: #f5f0e6;
+  --g-paper-hi: #fbf8f2;
+  --g-ink: #1b1814;
+  --g-hair: rgba(27, 24, 20, .22);
+  --g-hair-gold: rgba(176, 141, 87, .55);
+  --g-pad: calc(4vw + var(--sl));
+}
+
+/* =========================================================
+   0. 画面全体のグレーディング（3Dシーンの霞みを締める・周辺減光）
+   ========================================================= */
+html.g canvas#gl { filter: contrast(1.07) saturate(1.06) brightness(.985); }
+#g-grade { position: fixed; inset: 0; z-index: 5; pointer-events: none;
+  background:
+    radial-gradient(125% 95% at 50% 46%, transparent 52%, rgba(52, 38, 20, .16) 82%, rgba(30, 20, 8, .34) 100%),
+    linear-gradient(180deg, rgba(255, 248, 232, .05), transparent 30%, transparent 70%, rgba(40, 28, 12, .08)); }
+html.g #hud::before { background: linear-gradient(180deg, rgba(244,239,230,.42), transparent 15%, transparent 74%, rgba(244,239,230,.5)); }
+
+/* =========================================================
+   1. タイトル = 特別展ポスター（左: フレスコ図版 / 右: 文字組 / 右端: 縦書き＋朱印）
+   ========================================================= */
+html.g #intro { display: block;
+  background: radial-gradient(120% 120% at 70% 40%, #fbf8f1 0%, #f2ebdf 55%, #e6dccb 100%); }
+html.g #intro::after { inset: -30% -10% 0 30%; opacity: .55; }
+
+/* 図版 */
+.g-plate { position: absolute; z-index: 1; left: var(--g-pad); top: calc(11vh + var(--st)); bottom: calc(17vh + var(--sb)); width: 43vw;
+  opacity: 0; transform: translateY(14px); animation: g-rise 1.8s .15s var(--ease) forwards; }
+.g-plate .g-frame { position: absolute; inset: 0; overflow: hidden; background: #d9cdb6;
+  box-shadow: 0 0 0 1px rgba(125, 97, 54, .55), 0 0 0 5px var(--g-paper-hi), 0 0 0 6px rgba(125, 97, 54, .35),
+              0 28px 46px -26px rgba(48, 32, 12, .55), 0 6px 14px -8px rgba(48, 32, 12, .25); }
+.g-plate .g-img { position: absolute; inset: -4%; background: url("../assets/art/g4_adam.jpg") 24% 50% / cover no-repeat;
+  transform-origin: 37% 46%; animation: g-kenburns 28s ease-in-out infinite alternate; filter: sepia(.08) contrast(1.03); }
+/* 天窓光の当たり + 画面のごく薄い艶 */
+.g-plate .g-frame::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 249, 235, .26) 0%, transparent 38%, transparent 70%, rgba(40, 26, 10, .22) 100%); }
+.g-plate .g-cap { position: absolute; left: 0; right: 0; top: calc(100% + 14px); display: flex; justify-content: space-between; gap: 12px;
+  font-family: var(--serif); font-size: max(9.5px, calc(var(--u) * 2.25)); letter-spacing: .12em; color: var(--ink-3); white-space: nowrap; }
+.g-plate .g-cap i { color: var(--ink-2); }
+.g-plate .g-cap b { font-weight: 600; letter-spacing: .3em; color: var(--g-gold-lo); }
+@keyframes g-kenburns { from { transform: scale(1.02) translate(0, 0); } to { transform: scale(1.16) translate(-1.5%, -1%); } }
+@keyframes g-rise { to { opacity: 1; transform: none; } }
+
+/* 中央の縦の髪の毛線（エディトリアルの綴じ目） */
+.g-spine { position: absolute; z-index: 1; left: calc(var(--g-pad) + 43vw + 3.4vw); top: 11vh; bottom: 17vh; width: 1px;
+  background: linear-gradient(transparent, var(--g-hair-gold) 18%, var(--g-hair-gold) 82%, transparent); transform: scaleY(0); animation: g-grow 2s .5s var(--ease) forwards; }
+@keyframes g-grow { to { transform: scaleY(1); } }
+
+/* 文字組（右カラム） */
+html.g .intro-inner { position: absolute; left: calc(var(--g-pad) + 43vw + 7vw); right: calc(9.5vw + var(--sr)); top: 50%; width: auto;
+  transform: translateY(-52%); text-align: left; }
+html.g .intro-inner::before, html.g .intro-inner::after { margin-left: 0; background: linear-gradient(90deg, var(--g-gold), rgba(176,141,87,0)); }
+html.g .intro-inner::before { margin-bottom: calc(var(--u) * 2.6); }
+html.g .intro-inner::after { display: none; }
+@keyframes rulein { to { width: 78%; } }
+html.g .eyebrow { white-space: nowrap; font-style: normal; font-weight: 600; font-size: max(9.5px, calc(var(--u) * 2.3)); letter-spacing: .34em; color: var(--g-gold-lo); text-transform: uppercase; }
+html.g .eyebrow em { font-style: italic; font-weight: 500; letter-spacing: .12em; color: var(--ink-2); text-transform: none; margin-left: .4em; }
+html.g .logo { font-size: min(8.4vw, 17.5vh); letter-spacing: .1em; line-height: .9; margin: calc(var(--u) * 1.6) 0 0 -.05em; font-weight: 500; }
+html.g .logo > span { display: block; }
+html.g .logo > span + span { margin-left: .5em; } /* 2行目を半字下げ — 「トレイル」の歩みを文字組で */
+html.g .tagline { margin-top: calc(var(--u) * 2.4); letter-spacing: .42em; text-indent: 0; font-size: max(9.5px, calc(var(--u) * 2.4)); }
+html.g .tagline-jp { margin-top: calc(var(--u) * 1.1); letter-spacing: .12em; white-space: nowrap; font-size: max(12.5px, calc(var(--u) * 3.3)); }
+html.g .loader { margin: calc(var(--u) * 4) 0 0; width: 78%; }
+html.g #btn-start { margin-top: calc(var(--u) * 3.6); padding: calc(var(--u) * 1.8) calc(var(--u) * 4.6) calc(var(--u) * 1.8) calc(var(--u) * 5.4);
+  letter-spacing: .44em; text-indent: 0; background: var(--g-ink); color: var(--g-paper); border-color: var(--g-ink); }
+html.g #btn-start::before { background: var(--g-gold-lo); }
+html.g #btn-start::after { border-color: rgba(216, 191, 143, .5); }
+html.g #btn-start .g-arrow { display: inline-block; margin-left: .2em; letter-spacing: 0; font-family: var(--serif); transition: transform .6s var(--ease); }
+html.g #btn-start:hover .g-arrow, html.g #btn-start:active .g-arrow { transform: translateX(6px); }
+html.g #btn-start:hover, html.g #btn-start:active { color: var(--g-paper); letter-spacing: .5em; }
+/* ローダーと入館ボタンを同じ位置で入れ替える（レイアウトが跳ねない） */
+html.g .intro-inner .g-act { position: relative; }
+html.g .hint { margin-top: calc(var(--u) * 2.2); font-size: max(9.5px, calc(var(--u) * 2.2)); letter-spacing: .08em; line-height: 1.7; white-space: nowrap; }
+html.g .intro-credit { display: none; }
+
+/* 縦書きの展覧会名 + 朱印 */
+.g-tate { position: absolute; z-index: 1; right: calc(3.6vw + var(--sr)); top: calc(11vh + var(--st)); writing-mode: vertical-rl;
+  font-family: var(--mincho); font-weight: 600; font-size: max(12px, calc(var(--u) * 3.1)); letter-spacing: .5em; color: var(--ink);
+  opacity: 0; animation: fadeup 1.6s 1.2s var(--ease) forwards; }
+.g-tate small { display: block; margin-right: .9em; font-size: .72em; letter-spacing: .42em; color: var(--ink-3); font-weight: 500; }
+.g-tate { padding-bottom: 2.6em; }
+.g-seal { position: absolute; right: 50%; bottom: 0; margin-right: -.95em; display: grid; place-items: center; width: 1.9em; height: 1.9em; writing-mode: horizontal-tb;
+  font-size: max(11px, calc(var(--u) * 2.8)); letter-spacing: 0; line-height: 1; color: #f8eee4; background: var(--g-vermilion);
+  border-radius: 2px; box-shadow: inset 0 0 0 2px var(--g-vermilion), inset 0 0 0 3px rgba(248,238,228,.75); transform: rotate(-3deg);
+  font-family: var(--mincho); font-weight: 800; }
+
+/* 四隅のメタ（チケット/図録の奥付風） */
+.g-meta { position: absolute; z-index: 1; font-family: var(--serif); font-size: max(9px, calc(var(--u) * 2.1)); letter-spacing: .3em; color: var(--ink-3);
+  opacity: 0; animation: fadeup 1.6s 1.5s var(--ease) forwards; white-space: nowrap; }
+.g-meta.tl { left: var(--g-pad); top: calc(var(--u) * 3.4 + var(--st)); }
+.g-meta.tr { left: calc(var(--g-pad) + 43vw + 7vw); bottom: calc(var(--u) * 3.6 + var(--sb)); }
+.g-meta b { color: var(--ink); font-weight: 600; }
+.g-meta .g-dot { display: inline-block; width: 3px; height: 3px; margin: 0 .9em .25em; border-radius: 50%; background: var(--g-gold); }
+
+/* 入館時: 図版に吸い込まれるように */
+body.is-started.g-enter .g-plate { transition: transform 2.2s var(--ease), opacity 1.6s var(--ease); transform: scale(1.06); opacity: 0; }
+
+/* =========================================================
+   2. HUD 上部
+   ========================================================= */
+html.g .brand { letter-spacing: .46em; font-size: max(12px, calc(var(--u) * 2.9)); }
+html.g .brand small { font-size: .74em; letter-spacing: .22em; }
+html.g #hud-count { font-size: max(12px, calc(var(--u) * 3.1)); letter-spacing: .18em; }
+html.g .icon-btn { background: rgba(247,243,236,.62); border-color: rgba(27,24,20,.14); }
+
+/* =========================================================
+   3. 壁面キャプション（カルテル）
+   ========================================================= */
+html.g #card { background: linear-gradient(180deg, rgba(250,247,241,.95), rgba(244,238,227,.95));
+  outline: 1px solid var(--g-hair-gold); outline-offset: -6px;
+  box-shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 22px 44px -22px rgba(40,28,12,.5), 0 2px 8px rgba(40,28,12,.10); }
+html.g #card::after { left: 6px; width: 2px; }
+.g-card-room { position: relative; display: flex; align-items: center; gap: .8em; margin-bottom: calc(var(--u) * 1.1);
+  font-family: var(--serif); font-size: max(9px, calc(var(--u) * 2.15)); font-weight: 600; letter-spacing: .34em; color: var(--ink-3); white-space: nowrap; }
+.g-card-room b { color: var(--c); font-weight: 600; }
+.g-card-room::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--g-hair), transparent); }
+html.g #card-no { font-weight: 400; font-size: 2.5em; }
+html.g #card-cat { border-color: var(--g-hair-gold); color: var(--g-gold-lo); border-radius: 1px; }
+html.g #card-title { letter-spacing: .03em; font-feature-settings: "palt" 1; }
+html.g #card-summary { border-top: 0; padding-top: calc(var(--u) * 1.6); background: linear-gradient(90deg, var(--g-hair-gold), rgba(176,141,87,.06) 70%, transparent) 0 0 / 100% 1px no-repeat; }
+html.g .card-foot { padding-top: calc(var(--u) * 1); border-top: 1px dotted var(--g-hair); }
+
+/* =========================================================
+   4. 50日定規 — 丸の行列をやめ、刻みと菱形で（展示室は上部のブラケット）
+   ========================================================= */
+html.g #timeline { height: calc(var(--u) * 10.5); }
+html.g #timeline .tl-ruler { opacity: .42; }
+html.g #timeline .tl-tick { opacity: .22; height: 3px; }
+html.g #timeline .tl-tick.wk { height: 6px; opacity: .42; }
+html.g #timeline .tl-fill { height: 1px; margin-bottom: 0; background: linear-gradient(90deg, rgba(176,141,87,.25), var(--g-gold)); }
+html.g .tl-dot { width: 12px; margin-left: -6px; height: 14px; bottom: calc(var(--u) * 3.2 + 3px + var(--lift, 0px) * .58); }
+html.g .tl-dot::before { width: 4px; height: 4px; border: 0; border-radius: 50%; background: rgba(27,24,20,.55); transition: transform .5s var(--ease), background .4s; }
+html.g .tl-dot.past::before { background: var(--g-gold); }
+html.g .tl-dot.active::before { width: 7px; height: 7px; border-radius: 1px; background: var(--c); transform: rotate(45deg) scale(1.15);
+  box-shadow: 0 0 0 2px var(--g-paper-hi), 0 0 0 3px var(--c); }
+html.g .tl-dot.active::after { width: 16px; height: 16px; border-radius: 1px; transform: rotate(45deg); animation: g-ring 2.6s var(--ease) infinite; }
+@keyframes g-ring { from { transform: rotate(45deg) scale(.7); opacity: .7; } to { transform: rotate(45deg) scale(1.7); opacity: 0; } }
+html.g .tl-dot:active::before { transform: scale(1.8); }
+html.g #timeline .tl-now { width: 1px; background: var(--g-gold-lo); height: calc(var(--u) * 6.5); }
+html.g #timeline .tl-now::after { color: var(--g-gold-lo); letter-spacing: .12em; }
+html.g .tl-tip { background: rgba(27,24,20,.92); padding: 5px 12px 4px; letter-spacing: .08em; box-shadow: 0 8px 18px -10px rgba(0,0,0,.5); }
+html.g .tl-tip::after { content: ""; position: absolute; left: 50%; bottom: -4px; width: 7px; height: 7px; margin-left: -3.5px; background: inherit; transform: rotate(45deg); }
+/* 展示室ブラケット */
+.g-room { position: absolute; top: 0; height: 6px; border: 1px solid var(--g-hair); border-bottom: 0; pointer-events: none;
+  transition: border-color .8s, opacity .8s; opacity: .8; }
+.g-room span { position: absolute; left: 50%; top: -.62em; transform: translateX(-50%); padding: 0 .55em; font-family: var(--serif); font-style: italic;
+  font-size: max(9px, calc(var(--u) * 2.15)); line-height: 1; letter-spacing: .14em; color: var(--ink-3);
+  background: transparent; text-shadow: 0 0 4px rgba(247,243,236,1), 0 0 2px rgba(247,243,236,1); white-space: nowrap; }
+.g-room.on { border-color: var(--c); opacity: 1; }
+.g-room.on span { color: var(--ink); font-weight: 600; }
+@media (max-height: 340px) { .g-room span { display: none; } }
+
+/* =========================================================
+   5. 前後ナビ — 墨の円盤に真鍮の象嵌線
+   ========================================================= */
+html.g .nav button { background: rgba(250,247,241,.8); border-color: rgba(27,24,20,.14); }
+html.g #btn-next { background: radial-gradient(circle at 35% 30%, #34302a, var(--g-ink) 62%); border-color: var(--g-ink);
+  box-shadow: inset 0 0 0 3px var(--g-ink), inset 0 0 0 4px rgba(216,191,143,.6), 0 14px 26px -14px rgba(20,14,6,.7); }
+html.g #btn-next svg { stroke-width: 1.4; }
+html.g #btn-next.pulse::after { border-color: var(--g-gold); }
+
+/* =========================================================
+   6. 章扉（展示室タイトル）— ローマ数字の大きな刻印＋左右の罫線
+   ========================================================= */
+html.g #room-title .rt-inner { background: radial-gradient(closest-side, rgba(248,244,236,.82), rgba(248,244,236,.5) 55%, rgba(248,244,236,0));
+  padding: calc(var(--u) * 4) calc(var(--u) * 14); }
+html.g #room-title .rt-no { display: flex; align-items: center; justify-content: center; gap: 1.1em; letter-spacing: .4em; font-style: normal; }
+html.g #room-title .rt-no::before, html.g #room-title .rt-no::after { content: ""; width: calc(var(--u) * 12); height: 1px; background: var(--g-hair-gold);
+  transform: scaleX(0); animation: g-line 1.4s .25s var(--ease) forwards; }
+html.g #room-title .rt-no::before { transform-origin: right; }
+html.g #room-title .rt-no::after { transform-origin: left; }
+@keyframes g-line { to { transform: scaleX(1); } }
+.g-rn-label { font-size: .8em; color: var(--ink-3); font-weight: 600; letter-spacing: .5em; }
+.g-rn { font-size: 2.1em; font-weight: 500; line-height: 1; letter-spacing: .12em; color: var(--g-gold-lo); font-family: var(--serif); }
+html.g #room-title .rt-name { font-size: calc(var(--u) * 10.5); letter-spacing: .26em; }
+html.g #room-title .rt-name .g-l { display: inline-block; opacity: 0; transform: translateY(.18em); filter: blur(5px);
+  animation: letterin 1.2s var(--ease) forwards; animation-delay: calc(.045s * var(--i) + .15s); }
+html.g #room-title .rt-sub { letter-spacing: .34em; }
+html.g #room-title .rt-range { font-style: italic; letter-spacing: .32em; color: var(--g-gold-lo); }
+
+/* =========================================================
+   7. フィナーレ
+   ========================================================= */
+html.g #finale .f-inner { background: radial-gradient(closest-side, rgba(249,246,239,.94), rgba(249,246,239,.7) 60%, rgba(249,246,239,0));
+  padding: calc(var(--u) * 5) calc(var(--u) * 14); }
+html.g #finale .f-eyebrow { color: var(--g-gold-lo); font-style: normal; font-weight: 600; font-size: max(10px, calc(var(--u) * 2.4)); letter-spacing: .44em; }
+html.g #finale .f-title { font-size: calc(var(--u) * 8); letter-spacing: .18em; }
+html.g #finale .f-stats { gap: 0; }
+html.g #finale .f-stats span { padding: 0 calc(var(--u) * 4.5); }
+html.g #finale .f-stats span + span { border-left: 1px solid var(--g-hair-gold); }
+html.g #finale .f-stats b { font-weight: 400; font-size: calc(var(--u) * 8); }
+html.g #finale button { background: var(--g-ink); color: var(--g-paper); border-color: var(--g-ink); box-shadow: inset 0 0 0 3px var(--g-ink), inset 0 0 0 4px rgba(216,191,143,.5); }
+
+/* =========================================================
+   8. About
+   ========================================================= */
+html.g #about .box { outline: 1px solid var(--g-hair-gold); outline-offset: -8px; }
+html.g #about h2 { border-bottom-color: var(--g-hair-gold); }
+
+/* 小さい横画面: 図版を少し細く */
+@media (max-height: 360px) {
+  .g-plate { width: 40vw; }
+  .g-spine { left: calc(var(--g-pad) + 40vw + 3vw); }
+  html.g .intro-inner { left: calc(var(--g-pad) + 40vw + 6vw); }
+  html.g .hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .g-plate .g-img { animation: none; } }
