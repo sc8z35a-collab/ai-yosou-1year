@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """shot.py — 横画面スマホ想定(844x390)で撮影。メモリ1GB環境向けに単一ブラウザ・軽量フラグ。
 使い方: python3 scripts/shot.py [stop番号...]   例: python3 scripts/shot.py 0 1 5
-出力: /tmp/shots/stop_XX.png（リポジトリ外。必要ならアップロードして共有）"""
-import sys, os, asyncio, time
+出力: /tmp/shots/stop_XX.png（リポジトリ外。必要ならアップロードして共有）
+/tmp/browser.lock を自動で flock（同時ブラウザ1本ルール）。FT_URL で URL 差替、Q=low|mid|high。"""
+import sys, os, asyncio, time, fcntl
 from playwright.async_api import async_playwright
 URL = os.environ.get('FT_URL', 'http://localhost:8080/?autostart&q=' + os.environ.get('Q', 'mid'))
 stops = [int(x) for x in sys.argv[1:]] or [1]
@@ -30,4 +31,10 @@ async def main():
         print('renderer.info', info)
         print('errors:', errs[:10])
         await b.close()
+# 共有sandbox: ブラウザは全員で同時1本（メモリ1GB）。/tmp/browser.lock を自動取得して待ち行列化
+_lk = open('/tmp/browser.lock', 'w')
+try:
+    fcntl.flock(_lk, fcntl.LOCK_EX | fcntl.LOCK_NB)
+except BlockingIOError:
+    print('… 他エージェントがブラウザ使用中。/tmp/browser.lock の解放待ち'); fcntl.flock(_lk, fcntl.LOCK_EX)
 asyncio.run(main())

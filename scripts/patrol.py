@@ -10,6 +10,9 @@
   5. news.js: 件数 25〜40、日付が 2026-08-12〜2026-10-01 内、必須フィールド、出典
   6. 性能予算: テクスチャサイズ、castShadow 灯数の静的推定、巨大ファイル
   7. ライセンス: 外部画像URL（getty/shutterstock等）の混入
+  8. ULTRA フック契約: site/js/ultra*/index.js が install(ctx) を export しているか（roles/README）
+  9. 衝突マーカー残存（<<<<<<< / >>>>>>>）— 共有作業ツリーでの自動rebase事故検知
+ 10. アセット出典: site/assets/models/* と assets/art/*.jpg が CREDITS / art.js に記載されているか
 """
 import colorsys, json, os, re, subprocess, sys, datetime
 
@@ -18,10 +21,18 @@ SITE = os.path.join(ROOT, 'site')
 JS = os.path.join(SITE, 'js')
 issues = []  # (level, owner, msg)
 OWNER = {'main.js': 'A', 'post.js': 'A', 'index.html': 'A', 'exhibit.js': 'B', 'museum.js': 'C', 'news.js': 'C',
-         'fx.js': 'D', 'ui.js': 'E', 'controls.js': 'E', 'style.css': 'E', 'audio.js': 'F', 'perf.js': 'F'}
+         'fx.js': 'D', 'ui.js': 'E', 'controls.js': 'E', 'style.css': 'E', 'audio.js': 'F', 'perf.js': 'F',
+         'museum_f.js': 'F', 'lightpool.js': 'B', 'art.js': 'A', 'roles.py': 'ABYSS', 'patrol.py': 'F', 'shot.py': 'A'}
+DIR_OWNER = {'ultra': 'ABYSS', 'ultra_w1': 'W1', 'ultra_w2': 'W2', 'ultra_w3': 'W3', 'ultra_w4': 'W4'}
+
+def owner_of(f):
+    parts = os.path.relpath(f, ROOT).split(os.sep)
+    for d in parts[:-1]:
+        if d in DIR_OWNER: return DIR_OWNER[d]
+    return OWNER.get(os.path.basename(f), '?')
 
 def add(level, f, msg):
-    issues.append((level, OWNER.get(os.path.basename(f), '?'), f'{os.path.relpath(f, ROOT)}: {msg}'))
+    issues.append((level, owner_of(f), f'{os.path.relpath(f, ROOT)}: {msg}'))
 
 def js_files():
     for d, _, fs in os.walk(JS):
@@ -142,6 +153,45 @@ for d, _, fs in os.walk(SITE):
     for fn in fs:
         p = os.path.join(d, fn)
         if os.path.getsize(p) > 3_000_000: add('🟡', p, f'大きいアセット {os.path.getsize(p) // 1024}KB')
+
+# 8. ULTRA hook contract
+for d in sorted(os.listdir(JS)):
+    if not (d == 'ultra' or d.startswith('ultra_')) or not os.path.isdir(os.path.join(JS, d)): continue
+    idx = os.path.join(JS, d, 'index.js')
+    if not os.path.exists(idx):
+        add('🟡', os.path.join(JS, d, 'index.js'), 'ultra 拡張に index.js が無い（main から読めない）'); continue
+    src = open(idx, encoding='utf-8').read()
+    if d != 'ultra' and not re.search(r'export\s+(?:async\s+)?function\s+install\b|export\s+(?:const|let)\s+install\b|export\s*\{[^}]*\binstall\b', src):
+        add('🔴', idx, 'install(ctx) を export していない（フック契約違反）')
+    if re.search(r'requestAnimationFrame\s*\(', src):
+        add('🟡', idx, '拡張が独自に requestAnimationFrame を回している（update(t,dt,ctx) を使う契約）')
+
+# 9. conflict markers (tracked text files)
+ls = subprocess.run(['git', '-C', ROOT, 'ls-files'], capture_output=True, text=True).stdout.split()
+for rel in ls:
+    if not rel.endswith(('.js', '.md', '.html', '.css', '.py', '.sh', '.json')) or rel.startswith('site/vendor/'): continue
+    fp = os.path.join(ROOT, rel)
+    if not os.path.exists(fp): continue
+    try: txt = open(fp, encoding='utf-8', errors='ignore').read()
+    except Exception: continue
+    if re.search(r'^(<<<<<<< |>>>>>>> )', txt, re.M): add('🔴', fp, '衝突マーカーが残っている')
+
+# 10. asset credits
+cred = ''
+for c in ('site/assets/CREDITS.md', 'site/assets/art/CREDITS.md', 'site/js/data/art.js'):
+    if os.path.exists(os.path.join(ROOT, c)): cred += open(os.path.join(ROOT, c), encoding='utf-8').read()
+mdir = os.path.join(SITE, 'assets/models')
+if os.path.isdir(mdir):
+    for m in sorted(os.listdir(mdir)):
+        if os.path.isdir(os.path.join(mdir, m)) and m not in cred: add('🟡', os.path.join(mdir, m), 'CREDITS.md に出典記載なし')
+for sub in ('art', 'tex', 'hdri'):
+    ad = os.path.join(SITE, 'assets', sub)
+    if not os.path.isdir(ad): continue
+    for fn in sorted(os.listdir(ad)):
+        if not fn.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.hdr', '.exr')): continue
+        stem = re.sub(r'_(diff|nor_gl|rough|arm|disp|ao|spec)?_?\d?k?\.(jpg|jpeg|png|webp|hdr|exr)$', '', fn, flags=re.I)
+        stem = os.path.splitext(stem)[0]
+        if fn not in cred and stem not in cred: add('🟡', os.path.join(ad, fn), '出典記載なし（CREDITS/art.js）')
 
 # ---- output ----
 order = {'🔴': 0, '🟡': 1, '🟢': 2}

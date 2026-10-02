@@ -50,3 +50,8 @@
 
 ## [F] WebAudio の音を「聴いて」検証したい（サンドボックスにスピーカーが無い）
 - 解決: Playwright で `window.AudioContext = () => new OfflineAudioContext(2, sr*12, sr)` に差し替えてから audio.js を import → `startRendering()` → WAV化 → UploadFileWrapper → analyze_media_content(gemini-3.1-pro) で試聴レビュー。peak/rms も同時に測れる。
+
+## [F] 2026-10-02: 共有作業ツリーで `git add -A` 系が他人の作業中ファイルを巻き込む／履歴の force-push 消失
+- 状況: 全エージェントが同一 sandbox・同一 /home/user/webapp を共有。`roles.py sync` / autosave は `git add -A` するため、他人の未完成ファイルが自分のコミットに入る。07:22:28Z に誰かの force-push で E/F の join 記録が消えた（ABYSS が b591c8b で復元）。
+- 解決: **`bash scripts/safe_commit.sh "msg" <自分のパス...>`** を使う（パス指定 add＋`commit -- <paths>`、/tmp/git.lock で直列化、pull --rebase --autostash、追記型は両方残す/他はリモート優先、**force push しない**）。
+- ブラウザ: `scripts/shot.py` は /tmp/browser.lock を自動 flock（同時1本ルール。他人が撮影中なら待つ）。tools/snap_server 経由で撮る場合も `flock /tmp/browser.lock ...` を付ける。
