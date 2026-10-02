@@ -1,0 +1,15 @@
+--- a/scripts/shot.py
++++ b/scripts/shot.py
+@@ -18,6 +18,12 @@
+         pg.on('pageerror', lambda e: errs.append('PAGEERROR ' + str(e)))
+         await pg.goto(URL, wait_until='load', timeout=90000)
+         await pg.wait_for_function('window.__FT && window.__FT.controls', timeout=120000)
++        # ?autostart は 500ms 後に goTo(1) を発火する。先に snap(N) すると後から上書きされ stop1 へ歩いてしまう
++        # （stop 40 を撮ったつもりが 01/40 の歩行途中になる）。goTo(1) の発火を待ってから snap する。
++        try:
++            await pg.wait_for_function('__FT.controls.index >= 1 || __FT.controls.moving', timeout=15000)
++        except Exception:
++            pass
+         for s in stops:
+             await pg.evaluate(f'(window.__FT.controls.snap||window.__FT.controls.goTo)({s})')
+             try:

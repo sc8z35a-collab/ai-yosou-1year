@@ -1,0 +1,14 @@
+--- a/site/js/ui.js
++++ b/site/js/ui.js
+@@ -126,6 +126,11 @@
+     const n = news[i]; if (!n) return;
+     tip.textContent = `${fmtDate(n.date)}　${n.title}`;
+     tip.style.left = dots[i].style.left;
++    // 端の展示では中央揃えだと画面外にはみ出す → ビューポート内(余白8px)に収める
++    tip.style.transform = 'translateX(-50%)';
++    const r = tip.getBoundingClientRect(), m = 8;
++    const dx = r.left < m ? m - r.left : r.right > innerWidth - m ? innerWidth - m - r.right : 0;
++    if (dx) tip.style.transform = `translateX(calc(-50% + ${Math.round(dx)}px))`;
+     tip.classList.add('show'); clearTimeout(tipTimer); tipTimer = setTimeout(() => tip.classList.remove('show'), 2200);
+   }
+ 

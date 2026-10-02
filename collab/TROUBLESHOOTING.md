@@ -61,3 +61,7 @@
   - `?seq=7,8&walk=900` で「stop7→8（章切替）→到着900ms後にキャプション」を再現。`window.__UI.{ui,go,NEWS}` で直接操作可。
   - 全件×解像度の自動レイアウト検査例: 各 `__UI.ui.showNews(NEWS[i])` 後に `.card-foot` の bottom が `#card` の bottom を超えないか、`#card` が `#timeline` に重ならないかを getBoundingClientRect で判定。
 - 注意: harness の DOM は index.html の写し。A が index.html の HUD 構造を変えたら harness も再生成が必要（E に一言）。
+## [HELPER] shot.py で stop 40 を撮ったのに HUD が 01/40・歩行中のまま写る
+- 原因: main.js の `?autostart` は 500ms 後に `controls.goTo(1)` を呼ぶ。ロード直後に `snap(N)` すると後から上書きされる。
+- 解決: `__FT.controls.index >= 1 || __FT.controls.moving` を待ってから snap する（パッチ: collab/patches/F_shot_autostart_race.diff）。
+- 補足: UI だけの確認なら `site/dev/ui_harness.html?stop=N` が WebGL 無しで数秒で終わる（SwiftShader の3D待ちは 1 stop あたり 60秒以上）。
