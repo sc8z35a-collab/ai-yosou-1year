@@ -47,12 +47,15 @@ PROBE = r"""
     }
   });
   // 主要パネル同士の重なり
-  const panels = ['#card', '#chapter', '.chapter', '#room-title', '.room-title', '#finale', '.finale']
+  // #room-title は inset:0 の全画面コンテナなので、実際に見えるブロック .rt-inner で判定（全画面の箱で誤検知しない）
+  const panels = ['#card', '#room-title .rt-inner', '#finale .fin-inner', '#chapter']
     .map(s => document.querySelector(s)).filter(e => e && visibleChain(e));
   for (let i = 0; i < panels.length; i++) for (let j = i + 1; j < panels.length; j++) {
     const a = panels[i].getBoundingClientRect(), b = panels[j].getBoundingClientRect();
     const ix = Math.min(a.right, b.right) - Math.max(a.left, b.left), iy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
-    if (ix > 8 && iy > 8 && a.width && b.width) out.issues.push(`overlap: ${panels[i].id || panels[i].className} × ${panels[j].id || panels[j].className} (${ix|0}x${iy|0}px)`);
+    const op = e => { let o = 1; for (let x = e; x && x !== document.body; x = x.parentElement) o *= +getComputedStyle(x).opacity; return o; };
+    if (ix > 8 && iy > 8 && a.width && b.width && op(panels[i]) > 0.15 && op(panels[j]) > 0.15)
+      out.issues.push(`overlap: ${panels[i].id || panels[i].className} × ${panels[j].id || panels[j].className} (${ix|0}x${iy|0}px, α ${op(panels[i]).toFixed(2)}/${op(panels[j]).toFixed(2)})`);
   }
   out.index = F.controls.index;
   const counter = [...document.querySelectorAll('body *')].map(e => e.childNodes.length === 1 && e.textContent.trim()).find(t => t && /^\d{1,2}\s*\/\s*\d{1,2}$/.test(t));
