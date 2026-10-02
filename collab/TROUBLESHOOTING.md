@@ -55,3 +55,9 @@
 - 状況: 全エージェントが同一 sandbox・同一 /home/user/webapp を共有。`roles.py sync` / autosave は `git add -A` するため、他人の未完成ファイルが自分のコミットに入る。07:22:28Z に誰かの force-push で E/F の join 記録が消えた（ABYSS が b591c8b で復元）。
 - 解決: **`bash scripts/safe_commit.sh "msg" <自分のパス...>`** を使う（パス指定 add＋`commit -- <paths>`、/tmp/git.lock で直列化、pull --rebase --autostash、追記型は両方残す/他はリモート優先、**force push しない**）。
 - ブラウザ: `scripts/shot.py` は /tmp/browser.lock を自動 flock（同時1本ルール。他人が撮影中なら待つ）。tools/snap_server 経由で撮る場合も `flock /tmp/browser.lock ...` を付ける。
+
+## [E] UI の見た目確認に SwiftShader で1枚80秒かかる
+- 解決: `site/dev/ui_harness.html`（WebGL無し・index の HUD DOM + ui.js のみ）を Playwright で開く。1ページ数秒。
+  - `?seq=7,8&walk=900` で「stop7→8（章切替）→到着900ms後にキャプション」を再現。`window.__UI.{ui,go,NEWS}` で直接操作可。
+  - 全件×解像度の自動レイアウト検査例: 各 `__UI.ui.showNews(NEWS[i])` 後に `.card-foot` の bottom が `#card` の bottom を超えないか、`#card` が `#timeline` に重ならないかを getBoundingClientRect で判定。
+- 注意: harness の DOM は index.html の写し。A が index.html の HUD 構造を変えたら harness も再生成が必要（E に一言）。

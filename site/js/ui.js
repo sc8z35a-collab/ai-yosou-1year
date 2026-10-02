@@ -125,7 +125,10 @@ export function createUI({ news = [], wings = [], onStart, onNext, onPrev, onSel
   function showTip(i) {
     const n = news[i]; if (!n) return;
     tip.textContent = `${fmtDate(n.date)}　${n.title}`;
-    tip.style.left = dots[i].style.left;
+    tip.style.left = dots[i].style.left; tip.style.transform = '';
+    // 端の展示ではツールチップが画面外にはみ出す → タイムライン幅内に収める
+    const W = timeline.clientWidth, half = tip.offsetWidth / 2, x = parseFloat(dots[i].style.left) / 100 * W;
+    if (W && half) tip.style.transform = `translateX(calc(-50% + ${Math.round(Math.max(half - x, 0) - Math.max(x + half - W, 0))}px))`;
     tip.classList.add('show'); clearTimeout(tipTimer); tipTimer = setTimeout(() => tip.classList.remove('show'), 2200);
   }
 
@@ -197,6 +200,8 @@ export function createUI({ news = [], wings = [], onStart, onNext, onPrev, onSel
       $('#card-impact').textContent = n.impact ?? '';
       renderSource(n.source);
       renderSummary(n.summary);
+      summaryEl.scrollTop = 0;
+      requestAnimationFrame(() => summaryEl.classList.toggle('fits', summaryEl.scrollHeight <= summaryEl.clientHeight + 2));
       card.setAttribute('aria-label', `${fmtDate(n.date)} ${n.org ?? ''} ${n.title ?? ''}`);
       clearTimeout(cardTimer);
       card.classList.remove('show'); void card.offsetWidth;

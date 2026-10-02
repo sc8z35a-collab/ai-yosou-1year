@@ -24,3 +24,6 @@ research/E_factcheck.md, site/js/ui.js, site/js/controls.js, site/css/style.css
 - ✅ a11y: ボタンに日本語 aria-label/title、音ボタン aria-pressed、card に aria-live/tabindex、:focus-visible の真鍮リング、about に role=dialog。
 - ✅ about の「外部画像は使用していません」を実態（Met Open Access / Poly Haven CC0 使用）に合わせ修正。
 - 🆕 site/dev/ui_harness.html: WebGL無しで HUD/キャプション/章タイトルを数秒で検証（?seq=7,8&walk=900）。SwiftShader で1枚80秒待つ必要なし。
+- ✅ キャプションのレスポンシブ化: カードを flex 縦組みにし、狭い画面では本文だけ縮めてスクロール（下端フェード）、出典・IMPACT は常に表示。568x320/667x375/844x390/932x430 × 全40件で foot はみ出し0・タイムライン非干渉を自動検査。
+- ✅ タイムラインのツールチップが端の展示で画面外に出る問題を修正（全40件×2解像度で 0）。
+- 検査スクリプト（/tmp/e/fit.py, tip.py の内容）は TROUBLESHOOTING に手順として残した。

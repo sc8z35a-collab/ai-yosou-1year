@@ -140,6 +140,7 @@ body.is-started #hud { opacity: 1; }
 /* ---------- 壁面キャプション（詳細カード） ---------- */
 #card { position: absolute; left: calc(2.6vw + var(--sl)); bottom: calc(var(--u) * 13 + var(--sb)); width: min(44vw, 520px); max-height: calc(100% - var(--u) * 26);
   padding: calc(var(--u) * 2.4) calc(var(--u) * 3.4) calc(var(--u) * 2.2); overflow: hidden;
+  display: flex; flex-direction: column; /* 狭い画面では本文だけ縮めてスクロール、出典(foot)は常に見える */
   background: rgba(247,243,236,.9); backdrop-filter: blur(14px) saturate(1.05); -webkit-backdrop-filter: blur(14px) saturate(1.05);
   box-shadow: 0 1px 0 rgba(255,255,255,.8) inset, 0 18px 40px -18px rgba(40,30,15,.45), 0 2px 6px rgba(40,30,15,.12);
   opacity: 0; transform: translateY(14px); transition: opacity .7s var(--ease), transform .9s var(--ease), max-height .6s var(--ease); pointer-events: none; }
@@ -157,7 +158,11 @@ body.is-started #hud { opacity: 1; }
 #card-title { position: relative; margin-top: calc(var(--u) * 1); font-family: var(--mincho); font-size: max(20px, calc(var(--u) * 5.6)); font-weight: 700; line-height: 1.32; letter-spacing: .04em; color: var(--ink); }
 #card-en { position: relative; margin-top: calc(var(--u) * .4); font-family: var(--serif); font-style: italic; font-size: max(12px, calc(var(--u) * 3.2)); color: var(--ink-2); letter-spacing: .02em; transition: opacity .4s; }
 #card-summary { position: relative; margin-top: calc(var(--u) * 1.4); padding-top: calc(var(--u) * 1.4); border-top: 1px solid var(--rule);
-  font-family: var(--sans); font-size: max(13px, calc(var(--u) * 3.3)); line-height: 1.72; letter-spacing: .04em; color: var(--ink-2); text-align: justify; transition: opacity .4s; }
+  font-family: var(--sans); font-size: max(13px, calc(var(--u) * 3.3)); line-height: 1.72; letter-spacing: .04em; color: var(--ink-2); text-align: justify; transition: opacity .4s;
+  flex: 0 1 auto; min-height: 2.6em; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--rule) transparent;
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 1.2em), rgba(0,0,0,.25)); mask-image: linear-gradient(#000 calc(100% - 1.2em), rgba(0,0,0,.25)); }
+#card-summary.fits { -webkit-mask-image: none; mask-image: none; }
+.card-head, #card-org, #card-title, #card-en, .card-foot { flex: 0 0 auto; }
 #card-summary .ch { opacity: 0; animation: chin .6s var(--ease) forwards; animation-delay: calc(var(--i) * 12ms + 250ms); }
 @keyframes chin { from { opacity: 0; filter: blur(2px); } to { opacity: 1; filter: none; } }
 .card-foot { position: relative; display: flex; gap: 14px; justify-content: space-between; align-items: baseline; margin-top: calc(var(--u) * 1.6);

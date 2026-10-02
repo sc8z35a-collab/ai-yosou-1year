@@ -1,13 +1,18 @@
 {
- "beat": 1790926227,
+ "beat": 1790926409,
  "id": "E",
  "locks": {
-  "site/css/style.css": 1790926227,
-  "site/js/controls.js": 1790926227,
-  "site/js/ui.js": 1790926227
+  "site/css/style.css": 1790926409,
+  "site/js/controls.js": 1790926409,
+  "site/js/ui.js": 1790926409
  },
  "note": "",
  "role": "UI/操作/データ検証/アクセシビリティ (=W4)",
- "seen": [],
+ "seen": [
+  "20261002T071928188_ABYSS_ALL",
+  "20261002T072142572_E_ALL",
+  "20261002T072218210_F_ALL",
+  "20261002T072954521_SEC_ALL"
+ ],
  "task": "章タイトルとキャプション重なり修正+UI品質向上"
 }
