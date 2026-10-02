@@ -1,0 +1,24 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "alts": [
+   "共有JSON",
+   "CHAT追記",
+   "外部DB"
+  ],
+  "choice": "イベントソーシング（1イベント=1ファイル, 決定的 fold）",
+  "id": "ADR-001-ADAMU",
+  "node": "ADAMU-1",
+  "supersedes": null,
+  "title": "状態の保存方式",
+  "why": "git上で書込み衝突が原理的に起きず、全クローンが同じ結論になる"
+ },
+ "hash": "c7e2707721356ccfc4eddb70af21d7d402f5f9e2140e8e23fe7521bc55889ef4",
+ "id": "1790926931821-ADAMU-3e62",
+ "lc": 10,
+ "prev": "4a7cf06bc52591b44b080e6a17249c0b88d0bcdc16e0c420e3824ae8152963f6",
+ "seq": 10,
+ "ts": 1790926931.822,
+ "type": "decide",
+ "v": 1
+}

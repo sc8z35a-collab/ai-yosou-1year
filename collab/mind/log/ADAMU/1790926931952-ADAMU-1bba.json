@@ -1,0 +1,23 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "alts": [
+   "壁時計のみ",
+   "中央シーケンサ"
+  ],
+  "choice": "Lamport lc + (ts,agent,id) タイブレーク",
+  "id": "ADR-002-ADAMU",
+  "node": "ADAMU-1",
+  "supersedes": null,
+  "title": "順序付け",
+  "why": "sandbox間で時計が揃う保証がなく、サーバーも無い"
+ },
+ "hash": "ea3e81d8c9906e27d8f6c5b472ded19888fe619e02b4f8f5d3c797a43dc87d67",
+ "id": "1790926931952-ADAMU-1bba",
+ "lc": 11,
+ "prev": "c7e2707721356ccfc4eddb70af21d7d402f5f9e2140e8e23fe7521bc55889ef4",
+ "seq": 11,
+ "ts": 1790926931.953,
+ "type": "decide",
+ "v": 1
+}

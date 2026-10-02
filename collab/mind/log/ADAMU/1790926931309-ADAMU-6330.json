@@ -1,0 +1,28 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "claim": true,
+  "deps": [
+   "ADAMU-1"
+  ],
+  "done_when": "",
+  "id": "ADAMU-2",
+  "kind": "task",
+  "parent": "G-MIND",
+  "prio": "P2",
+  "scope": [
+   "tests/test_mind.py"
+  ],
+  "tags": [],
+  "title": "テストスイート",
+  "why": "並行書込み・改ざん・git競合を機械的に保証する"
+ },
+ "hash": "6dc42a3b4f521bd0706aba4608e574da1a5def602bc3e5b510615dbaa026a677",
+ "id": "1790926931309-ADAMU-6330",
+ "lc": 4,
+ "prev": "30f84bab11149bbcb5e648785726a4ae9f1dc392e206be3a9b13849f87c3c4dd",
+ "seq": 4,
+ "ts": 1790926931.309,
+ "type": "intent",
+ "v": 1
+}

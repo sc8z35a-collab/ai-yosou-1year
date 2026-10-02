@@ -1,0 +1,17 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "conf": 0.9,
+  "key": "shared.sandbox",
+  "src": "CHAT 07:23 B の観察",
+  "value": true
+ },
+ "hash": "ceea07da5aa1640185b0b6f5badad80ad7f80699e3b529378a4df939a1f67b1a",
+ "id": "1790926932044-ADAMU-943a",
+ "lc": 12,
+ "prev": "ea3e81d8c9906e27d8f6c5b472ded19888fe619e02b4f8f5d3c797a43dc87d67",
+ "seq": 12,
+ "ts": 1790926932.044,
+ "type": "believe",
+ "v": 1
+}

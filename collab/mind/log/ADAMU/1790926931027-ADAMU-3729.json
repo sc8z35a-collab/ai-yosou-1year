@@ -1,0 +1,25 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "caps": [
+   "python",
+   "git",
+   "distributed-systems"
+  ],
+  "master": "obomu",
+  "owns": [
+   "scripts/mind.py",
+   "collab/mind/*",
+   "tests/test_mind.py"
+  ],
+  "role": "MindFS 設計・保守（意思/意図/計画の共有層）"
+ },
+ "hash": "8deec0a6327ee7c0798b0ecc052b28f9207dc63c2e9a128d4ab3b5208cd77480",
+ "id": "1790926931027-ADAMU-3729",
+ "lc": 1,
+ "prev": null,
+ "seq": 1,
+ "ts": 1790926931.027,
+ "type": "hello",
+ "v": 1
+}

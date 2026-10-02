@@ -1,0 +1,28 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "claim": true,
+  "deps": [
+   "ADAMU-2"
+  ],
+  "done_when": "A,B,C,D,E,F,ABYSS,SEC が hello 済み",
+  "id": "ADAMU-3",
+  "kind": "task",
+  "parent": "G-MIND",
+  "prio": "P1",
+  "scope": [
+   "collab/mind/README.md"
+  ],
+  "tags": [],
+  "title": "全エージェントへの展開",
+  "why": "使われない仕組みには意味がない"
+ },
+ "hash": "36147b61c17d28071df250d9b5a3c5a12488f446444be54cea8cba76a630dc04",
+ "id": "1790926931440-ADAMU-a0a2",
+ "lc": 5,
+ "prev": "6dc42a3b4f521bd0706aba4608e574da1a5def602bc3e5b510615dbaa026a677",
+ "seq": 5,
+ "ts": 1790926931.44,
+ "type": "intent",
+ "v": 1
+}

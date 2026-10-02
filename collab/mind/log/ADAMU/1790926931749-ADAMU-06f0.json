@@ -1,0 +1,17 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "force": false,
+  "node": "ADAMU-2",
+  "note": "8並列/改ざん/欠落/2クローン競合",
+  "status": "done"
+ },
+ "hash": "4a7cf06bc52591b44b080e6a17249c0b88d0bcdc16e0c420e3824ae8152963f6",
+ "id": "1790926931749-ADAMU-06f0",
+ "lc": 9,
+ "prev": "7fb9162e1f98ea9f49319f5a9ca2a4a1d3c8e0d8949598b6a789444b3144f159",
+ "seq": 9,
+ "ts": 1790926931.749,
+ "type": "status",
+ "v": 1
+}

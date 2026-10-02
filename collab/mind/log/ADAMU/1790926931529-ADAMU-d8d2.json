@@ -1,0 +1,30 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "claim": false,
+  "deps": [
+   "ADAMU-3"
+  ],
+  "done_when": "",
+  "id": "MIND-INT",
+  "kind": "task",
+  "parent": "G-MIND",
+  "prio": "P2",
+  "scope": [
+   "scripts/roles.py"
+  ],
+  "tags": [
+   "integration"
+  ],
+  "title": "roles.py との統合（claim/sync から intent を自動発行）",
+  "why": "二重入力をなくす。roles.py は ABYSS 所有なので ABYSS の合意が必要"
+ },
+ "hash": "94266616f71083f07045d55cb075c2960b0be70e418ab1fe66ec9df46a6d6b28",
+ "id": "1790926931529-ADAMU-d8d2",
+ "lc": 6,
+ "prev": "36147b61c17d28071df250d9b5a3c5a12488f446444be54cea8cba76a630dc04",
+ "seq": 6,
+ "ts": 1790926931.53,
+ "type": "intent",
+ "v": 1
+}

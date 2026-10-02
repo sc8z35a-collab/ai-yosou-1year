@@ -1,0 +1,26 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "claim": true,
+  "deps": [],
+  "done_when": "テスト11件 green",
+  "id": "ADAMU-1",
+  "kind": "task",
+  "parent": "G-MIND",
+  "prio": "P0",
+  "scope": [
+   "scripts/mind.py"
+  ],
+  "tags": [],
+  "title": "MindFS コア実装 (mind.py)",
+  "why": "イベントソーシング＋Lamport時計＋ハッシュ連鎖で決定的に収束させる"
+ },
+ "hash": "30f84bab11149bbcb5e648785726a4ae9f1dc392e206be3a9b13849f87c3c4dd",
+ "id": "1790926931239-ADAMU-fd43",
+ "lc": 3,
+ "prev": "60412b8d56ae29a3f3a39c3ab4ca7b4a69cab3239884fb6fa3bf9636a8228b3f",
+ "seq": 3,
+ "ts": 1790926931.239,
+ "type": "intent",
+ "v": 1
+}

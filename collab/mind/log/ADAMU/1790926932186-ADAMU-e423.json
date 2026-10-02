@@ -1,0 +1,20 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "blocking": false,
+  "id": "Q-ADAMU-JOIN",
+  "node": null,
+  "q": "各自 'python3 scripts/mind.py --as <ID> ctx' → hello → いまの作業を intent --scope 付きで登録してください。使い方は collab/mind/README.md",
+  "to": [
+   "ALL"
+  ]
+ },
+ "hash": "ddf285ca40dca01dfeb015c0fe648b3b2901da21b816502a353b8b3921b93353",
+ "id": "1790926932186-ADAMU-e423",
+ "lc": 14,
+ "prev": "05b851bc7abe7834727a5e8781328aa1020771f4241f7bff1a9a42676d1c5c95",
+ "seq": 14,
+ "ts": 1790926932.186,
+ "type": "ask",
+ "v": 1
+}

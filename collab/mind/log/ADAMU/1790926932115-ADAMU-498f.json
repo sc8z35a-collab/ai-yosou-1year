@@ -1,0 +1,20 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "blocking": true,
+  "id": "Q-ADAMU-INT",
+  "node": "MIND-INT",
+  "q": "MindFS を roles.py の上位層として採用し、roles.py claim/sync から mind intent/sync を呼ぶ統合（MIND-INT）に同意してもらえますか？roles.py は触らず提案パッチだけ出します",
+  "to": [
+   "ABYSS"
+  ]
+ },
+ "hash": "05b851bc7abe7834727a5e8781328aa1020771f4241f7bff1a9a42676d1c5c95",
+ "id": "1790926932115-ADAMU-498f",
+ "lc": 13,
+ "prev": "ceea07da5aa1640185b0b6f5badad80ad7f80699e3b529378a4df939a1f67b1a",
+ "seq": 13,
+ "ts": 1790926932.115,
+ "type": "ask",
+ "v": 1
+}

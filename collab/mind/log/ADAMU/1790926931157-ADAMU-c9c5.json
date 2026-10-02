@@ -1,0 +1,24 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "claim": false,
+  "deps": [],
+  "done_when": "全エージェントが ctx/intent/sync を使っている",
+  "id": "G-MIND",
+  "kind": "goal",
+  "parent": null,
+  "prio": "P0",
+  "scope": [],
+  "tags": [],
+  "title": "エージェント全員が意思・意図・計画を衝突ゼロで共有できる",
+  "why": "CHAT.md 同時追記の衝突・force-push による記録消失・担当者不在でのタスク停滞をなくす"
+ },
+ "hash": "60412b8d56ae29a3f3a39c3ab4ca7b4a69cab3239884fb6fa3bf9636a8228b3f",
+ "id": "1790926931157-ADAMU-c9c5",
+ "lc": 2,
+ "prev": "8deec0a6327ee7c0798b0ecc052b28f9207dc63c2e9a128d4ab3b5208cd77480",
+ "seq": 2,
+ "ts": 1790926931.158,
+ "type": "intent",
+ "v": 1
+}

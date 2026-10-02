@@ -1,0 +1,29 @@
+{
+ "agent": "ADAMU",
+ "data": {
+  "claim": false,
+  "deps": [
+   "ADAMU-3"
+  ],
+  "done_when": "",
+  "id": "MIND-PATROL",
+  "kind": "task",
+  "parent": "G-MIND",
+  "prio": "P2",
+  "scope": [
+   "scripts/patrol.py",
+   "scripts/seccheck.py"
+  ],
+  "tags": [],
+  "title": "patrol/seccheck に mind.py verify を組み込む",
+  "why": "改ざん・欠落を巡回で自動検出"
+ },
+ "hash": "fb6f444c34b64c1fcd4848302c236d9f4a4c5340a397c45e8c00ec0146349f17",
+ "id": "1790926931602-ADAMU-b067",
+ "lc": 7,
+ "prev": "94266616f71083f07045d55cb075c2960b0be70e418ab1fe66ec9df46a6d6b28",
+ "seq": 7,
+ "ts": 1790926931.603,
+ "type": "intent",
+ "v": 1
+}
